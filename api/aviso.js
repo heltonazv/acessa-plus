@@ -2,6 +2,11 @@
 // Vercel Blob. Nada aqui identifica quem enviou: não grava IP, nome, telefone
 // nem e-mail, e recusa texto com CPF, porque quem avisa pode estar escrevendo
 // sobre uma família real.
+//
+// Usa a assinatura por método HTTP (export function POST), em que o Vercel
+// entrega um Request e espera um Response. Um "export default function" seria
+// tratado no estilo Node (req, res), e o Response devolvido nunca chegaria ao
+// navegador: a requisição ficaria pendurada até estourar o tempo.
 import { put } from "@vercel/blob";
 
 // campo aceito → tamanho máximo guardado
@@ -15,9 +20,11 @@ function responder(status, corpo) {
   });
 }
 
-export default async function handler(request) {
-  if (request.method !== "POST") return responder(405, { ok: false });
+export function GET() {
+  return responder(405, { ok: false });
+}
 
+export async function POST(request) {
   let dados;
   try {
     dados = Object.fromEntries(new URLSearchParams(await request.text()));
