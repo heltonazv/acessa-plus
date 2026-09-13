@@ -1,0 +1,10 @@
+{
+  "name": "acessa-plus",
+  "private": true,
+  "type": "module",
+  "description": "ACESSA+: orientação sobre direitos e benefícios de pessoas com deficiência",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@vercel/blob": "^2.8.0"
+  }
+}

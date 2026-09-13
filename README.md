@@ -5,44 +5,43 @@ e suas famílias. Artefato de tese de doutorado profissional da Universidade
 Positivo, com apoio do ecohub espaço maker.
 
 Piloto com 11 benefícios: federais, estaduais do Paraná e municipais de Londrina.
+No ar em <https://acessa-plus.vercel.app>.
 
 ## O que este repositório é
 
-Um site estático de arquivo único. Não há build, não há back-end, não há banco.
-O `index.html` carrega sozinho e funciona offline depois da primeira visita.
+Um site estático publicado pelo Vercel, com uma única função no servidor: a que
+recebe os avisos enviados pelo site. Não há build nem banco de dados.
 
 ```
 fonte/acessa.html   o arquivo que se edita: conteúdo, motor de decisão e interface
 index.html          gerado a partir da fonte, com a tipografia local; não edite à mão
+api/aviso.js        recebe os avisos e guarda cada um como arquivo privado no Vercel Blob
 fontes/             Poppins hospedada aqui, para não entregar o IP de quem visita
                     a um servidor de terceiro
 docs/               arquitetura, protocolo de teste de acessibilidade e roteiro do piloto
-netlify.toml        publicação, cabeçalhos de segurança e política de cache
+vercel.json         cabeçalhos de segurança e política de cache
+package.json        dependência da função de avisos
 montar.pl           gera o index.html a partir da fonte
-previa.pl           servidor local com os mesmos cabeçalhos do netlify.toml
+previa.pl           servidor local com os mesmos cabeçalhos da produção
 CHANGELOG.md        o que mudou em cada versão
 ```
 
 ## Rodar localmente
 
 ```
+perl montar.pl
 perl previa.pl 8790
 ```
 
 Abre em `http://127.0.0.1:8790`. Usa a mesma Content-Security-Policy da
 produção, então um recurso externo que passar despercebido quebra aqui antes de
-quebrar no ar.
+quebrar no ar. Na prévia, os avisos enviados ficam em `avisos-locais.txt`, fora
+do git.
 
 ## Editar e publicar
 
-Edite `fonte/acessa.html`, gere o site e confira:
-
-```
-perl montar.pl
-perl previa.pl 8790
-```
-
-Depois publique. O Netlify observa a branch principal: todo push publica.
+Edite `fonte/acessa.html`, gere o site com `perl montar.pl` e confira na prévia.
+Depois publique. O Vercel observa a branch principal: todo push publica.
 
 ```
 git add -A
@@ -50,13 +49,11 @@ git commit -m "descrição da mudança"
 git push
 ```
 
-Sem build: o Netlify serve a raiz como está.
-
 ## Piloto com agentes comunitários
 
 O roteiro para começar os testes está em [docs/piloto-agentes.md](docs/piloto-agentes.md).
-Os links por unidade ficam em `#/links-piloto`, e os avisos enviados pelo site
-chegam em *Netlify → Forms → aviso*.
+Os links por unidade ficam em `#/links-piloto`. Os avisos enviados pelo site ficam
+em *Vercel → acessa-plus → Storage → acessa-plus-blob*, na pasta `avisos/`.
 
 ## Verificações antes de publicar
 
@@ -81,6 +78,9 @@ serviços como este:
 - **jurisprudência** — decisão de tribunal, não vale automaticamente
 - **prática** — é como o órgão opera, não está na norma
 - **relato** — o que costuma acontecer no atendimento
+
+Endereços e telefones de locais só entram quando copiados de página oficial, com
+a data em que foram conferidos.
 
 ## Instrumentos e padrões
 

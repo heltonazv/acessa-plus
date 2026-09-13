@@ -559,13 +559,6 @@ main { display:block; }
 
 <div class="origem" id="origemBar" hidden></div>
 
-<!-- Cópia estática do formulário de aviso. O Netlify só registra formulários que
-     encontra no HTML publicado; o que a pessoa usa é montado pelo script. -->
-<form name="aviso" data-netlify="true" netlify-honeypot="campo-isca" hidden>
-  <input name="campo-isca"><input name="tipo"><textarea name="mensagem"></textarea>
-  <input name="fonte_correta"><input name="beneficio"><input name="pagina"><input name="origem">
-</form>
-
 <div class="vh" id="anuncio" role="status" aria-live="polite"></div>
 
 <main>
@@ -2632,7 +2625,7 @@ main { display:block; }
   }
 
   /* ---------- aviso à curadoria ----------
-     Chega de fato: no site publicado, o Netlify recebe e guarda em Forms.
+     Chega de fato: no site publicado, a função api/aviso guarda cada aviso como arquivo privado no Vercel Blob.
      Não pede nome, telefone nem e-mail, e barra CPF digitado por engano,
      porque quem avisa pode estar escrevendo sobre uma família real. */
   var CPF_RE = /\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/;
@@ -2663,7 +2656,7 @@ main { display:block; }
     if (!msg) { st.textContent = "Escreva o que aconteceu antes de enviar."; campoMsg.focus(); return; }
     if (CPF_RE.test(msg) || CPF_RE.test(fonteC)) { st.textContent = "Parece que há um CPF no texto. Apague antes de enviar: o aviso não pode ter dado pessoal."; campoMsg.focus(); return; }
     var dados = {
-      "form-name": "aviso", "campo-isca": form.querySelector('[name="campo-isca"]').value,
+      "campo-isca": form.querySelector('[name="campo-isca"]').value,
       tipo: (form.querySelector('[name="tipo"]:checked') || {}).value || "",
       mensagem: msg, fonte_correta: fonteC,
       beneficio: form.querySelector('[name="beneficio"]').value,
@@ -2672,7 +2665,7 @@ main { display:block; }
     var corpo = Object.keys(dados).map(function (k) { return encodeURIComponent(k) + "=" + encodeURIComponent(dados[k]); }).join("&");
     var botao = form.querySelector('button[type="submit"]');
     botao.disabled = true; st.textContent = "Enviando…";
-    fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: corpo })
+    fetch("/api/aviso", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: corpo })
       .then(function (r) {
         if (!r.ok) throw new Error(String(r.status));
         st.textContent = "Aviso recebido. Obrigado: a curadoria vai conferir.";
@@ -2696,7 +2689,7 @@ main { display:block; }
   function viewLinksPiloto() {
     setTitle("Links do piloto");
     var publicado = /^https?:$/.test(location.protocol) && location.hostname.indexOf("claude") === -1;
-    var base = publicado ? location.origin + location.pathname : "https://SEU-SITE.netlify.app/";
+    var base = publicado ? location.origin + location.pathname : "https://acessa-plus.vercel.app/";
     var itens = Object.keys(ENTIDADES).map(function (id) {
       var e = ENTIDADES[id], url = base + "?org=" + id + "#/";
       return '<li class="local"><strong class="local__nome">' + esc(e.nome) + '</strong>' +
@@ -2710,7 +2703,7 @@ main { display:block; }
       '<h1 class="upper" id="titulo-view" tabindex="-1">Links do piloto</h1>' +
       '<p class="intro">Um link por unidade ou equipe. Ele registra só de onde a pessoa chegou, nunca quem ela é.</p>' +
       '<div class="card card--note" role="note"><p><b>Estes códigos são de exemplo.</b> Para o teste, cadastre as unidades reais em ENTIDADES, no arquivo fonte/acessa.html, e publique de novo.' +
-      (publicado ? '' : ' O endereço do site aparece aqui depois que ele estiver publicado.') + '</p></div>' +
+      (publicado ? '' : '') + '</p></div>' +
       '<ul class="locais">' + itens + '</ul></div>';
   }
 

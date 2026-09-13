@@ -1,5 +1,14 @@
 # Mudanças
 
+## v0.1.1-piloto — 12/09/2026
+
+- Publicação pelo Vercel, em https://acessa-plus.vercel.app, com os mesmos
+  cabeçalhos de segurança no `vercel.json`. O `netlify.toml` saiu.
+- Avisos gravados pela função `api/aviso.js` num armazenamento Blob privado do
+  Vercel, na região de São Paulo. Sem IP, nome, telefone ou e-mail; CPF recusado
+  também no servidor.
+- Links do piloto já usam o endereço publicado.
+
 ## v0.1-piloto — 12/09/2026
 
 Primeira versão preparada para teste com agentes comunitários.
