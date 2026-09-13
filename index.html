@@ -241,6 +241,15 @@ main { display:block; }
 
 .mono { font-family:ui-monospace, "SFMono-Regular", Consolas, monospace; font-size:.92em; }
 
+/* onde ir: cartões de contato */
+.locais { list-style:none; margin:.75rem 0 1rem; padding:0; display:grid; gap:.75rem; grid-template-columns:repeat(auto-fit, minmax(15rem, 1fr)); }
+.local { background:var(--surface); border:1px solid var(--line); padding:.85rem 1rem; display:flex; flex-direction:column; gap:.2rem; margin:0; }
+.local__nome { font-size:1rem; }
+.local__end, .local__hor { font-size:.92rem; color:var(--ink-soft); }
+.local__tel { font-size:1rem; }
+.local__tel a { font-weight:600; }
+.local__site { font-size:.9rem; display:inline-flex; gap:.35rem; align-items:center; margin-top:.25rem; }
+
 /* lista de tarefas: cada etapa termina numa ação */
 .tarefa__topo { display:flex; flex-wrap:wrap; gap:.5rem .8rem; align-items:baseline; }
 .tarefa__topo .steptitle { flex:1 1 16rem; }
@@ -727,7 +736,7 @@ main { display:block; }
      só carrega de onde a pessoa veio. O id é validado contra a lista, então nada
      que venha da URL chega ao HTML sem passar por aqui. */
   var ENTIDADES = {
-    "cras-centro":   { nome: "CRAS Centro", tipo: "CRAS", municipio: "londrina" },
+    "cras-centro":   { nome: "CRAS Centro A", tipo: "CRAS", municipio: "londrina" },
     "ubs-vila-nova": { nome: "UBS Vila Nova", tipo: "Unidade Básica de Saúde", municipio: "londrina" },
     "ecohub-up":     { nome: "ecohub, Universidade Positivo", tipo: "Universidade", municipio: "londrina" },
     "cmpd-londrina": { nome: "Conselho Municipal da Pessoa com Deficiência", tipo: "Conselho", municipio: "londrina" },
@@ -805,7 +814,7 @@ main { display:block; }
   /* ---------- dados de exemplo ---------- */
   var BENEFITS = {
     "fed-renda-001-bpc": {
-      id: "FED-RENDA-001", area: "renda", nome: "Benefício de Prestação Continuada (BPC)",
+      id: "FED-RENDA-001", onde: ["cras", "dpu"], area: "renda", nome: "Benefício de Prestação Continuada (BPC)",
       popular: "LOAS, benefício do INSS de um salário mínimo", esfera: "Federal",
       orgao: "INSS e Ministério do Desenvolvimento e Assistência Social", verificado: "12/08/2026", vencido: false,
       regras: [
@@ -900,7 +909,7 @@ main { display:block; }
       canais: [
         ["Telefone 135", "Ligação gratuita de qualquer telefone. Atende de segunda a sábado. Faz o pedido, remarca e informa resultado.", null],
         ["Meu INSS, site e aplicativo", "Para pedir, acompanhar e recorrer sem sair de casa.", "Exige conta gov.br nível prata ou ouro.", "https://meu.inss.gov.br"],
-        ["CRAS do seu bairro", "Endereço de exemplo: Rua das Acácias, 120. Faz o CadÚnico e orienta sobre o BPC.", null]
+        ["CRAS de Londrina", "Dez unidades, uma por região. Faz o CadÚnico e orienta sobre o BPC.", null, "https://portal.londrina.pr.gov.br/unidades-de-protecao-social-basica/cras"]
       ],
       fontes: [
         ["F0", "Lei 8.742 de 1993, a LOAS, artigos 20 e 21", "Portal da Legislação, Planalto", "https://www.planalto.gov.br/ccivil_03/leis/l8742.htm", "loas"],
@@ -913,7 +922,7 @@ main { display:block; }
       relacionado: [["fed-contas-002-tarifa-social", "Tarifa Social de Energia Elétrica"], ["fed-transporte-003-passe-livre", "Passe Livre Interestadual"]]
     },
     "fed-contas-002-tarifa-social": {
-      id: "FED-CONTAS-002", area: "contas", nome: "Tarifa Social de Energia Elétrica",
+      id: "FED-CONTAS-002", onde: ["cras", "copel-ldna"], area: "contas", nome: "Tarifa Social de Energia Elétrica",
       popular: "conta de luz de graça, tarifa social, desconto na luz",
       esfera: "Federal, operada pela distribuidora", orgao: "ANEEL, e Copel no Paraná",
       verificado: "07/09/2026", vencido: false,
@@ -1006,7 +1015,7 @@ main { display:block; }
     },
 
     "est-contas-010-energia-solidaria": {
-      id: "EST-CONTAS-010", area: "contas", nome: "Energia Solidária, do Paraná",
+      id: "EST-CONTAS-010", onde: ["cras", "copel-ldna"], area: "contas", nome: "Energia Solidária, do Paraná",
       popular: "conta de luz zerada do Governo do Paraná",
       esfera: "Estadual, Paraná", orgao: "Governo do Paraná e Copel",
       verificado: "07/09/2026", vencido: false,
@@ -1083,7 +1092,7 @@ main { display:block; }
     },
 
     "fed-contas-011-equipamento-vital": {
-      id: "FED-CONTAS-011", area: "contas", nome: "Cadastro de equipamento vital e tarifa por equipamento eletromédico",
+      id: "FED-CONTAS-011", onde: ["copel-ldna", "cras"], area: "contas", nome: "Cadastro de equipamento vital e tarifa por equipamento eletromédico",
       popular: "cadastro de quem usa aparelho ligado na tomada para viver",
       esfera: "Federal, operado pela distribuidora", orgao: "ANEEL e Copel, no Paraná",
       verificado: "07/09/2026", vencido: false,
@@ -1158,7 +1167,7 @@ main { display:block; }
     },
 
     "fed-transporte-003-passe-livre": {
-      id: "FED-TRANSPORTE-003", area: "transporte", nome: "Passe Livre Interestadual",
+      id: "FED-TRANSPORTE-003", onde: ["cras", "dpu"], area: "transporte", nome: "Passe Livre Interestadual",
       popular: "passagem de graça para viajar entre estados", esfera: "Federal", orgao: "ANTT, Agência Nacional de Transportes Terrestres",
       verificado: "07/09/2026", vencido: false,
       regras: [
@@ -1225,7 +1234,7 @@ main { display:block; }
         ["Sistema do Passe Livre da ANTT", "Onde pedir, renovar e consultar a credencial.", "Pode exigir conta gov.br. Confirme o nível exigido no sistema.", "https://passelivre.antt.gov.br"],
         ["Ouvidoria da ANTT, telefone 166", "Ligação gratuita, todos os dias, 24 horas.", null, null],
         ["Manual de solicitação do Passe Livre", "Passo a passo oficial, em PDF.", null, "https://www.gov.br/antt/pt-br/assuntos/passageiros/passageiros-rodoviarios/passe-livre/passageiro/MANUALDESOLICITAODOPASSELIVREINTERESTADUAL.pdf"],
-        ["CRAS do seu bairro", "Endereço de exemplo: Rua das Acácias, 120. Orientação e ajuda para montar o pedido.", null]
+        ["CRAS de Londrina", "Dez unidades, uma por região. Orientação e ajuda para montar o pedido.", null, "https://portal.londrina.pr.gov.br/unidades-de-protecao-social-basica/cras"]
       ],
       fontes: [
         ["F0", "Lei 8.899 de 1994", "Portal da Legislação, Planalto", "https://www.planalto.gov.br/ccivil_03/leis/l8899.htm", "lei8899"],
@@ -1243,7 +1252,7 @@ main { display:block; }
        aparecer como "em conferência" em vez de passar por norma. */
 
     "fed-renda-004-bolsa-familia": {
-      id: "FED-RENDA-004", area: "renda", nome: "Bolsa Família", popular: "o Bolsa",
+      id: "FED-RENDA-004", onde: ["cras"], area: "renda", nome: "Bolsa Família", popular: "o Bolsa",
       esfera: "Federal", orgao: "Ministério do Desenvolvimento e Assistência Social", verificado: "06/09/2026", vencido: false,
       regras: [
         { tipo: "rendaPerCapita", param: "bfRendaPc", nome: "R$ 218 por pessoa" },
@@ -1293,7 +1302,7 @@ main { display:block; }
       canais: [
         ["Aplicativo Bolsa Família", "Consulta de parcela, situação e compromissos.", null, null],
         ["Telefone 121", "Ligação gratuita. Central de atendimento do programa.", null, null],
-        ["CRAS do seu bairro", "Endereço de exemplo: Rua das Acácias, 120.", null, null]
+        ["CRAS de Londrina", "Dez unidades, uma por região. Faz e atualiza o CadÚnico.", null, "https://portal.londrina.pr.gov.br/unidades-de-protecao-social-basica/cras"]
       ],
       fontes: [
         ["F0", "Bolsa Família, conheça as regras", "gov.br, Ministério do Desenvolvimento e Assistência Social", "https://www.gov.br/mds/pt-br/acoes-e-programas/bolsa-familia/paginas/conheca-as-regras", "bf-regras"],
@@ -1303,7 +1312,7 @@ main { display:block; }
     },
 
     "fed-renda-005-auxilio-inclusao": {
-      id: "FED-RENDA-005", area: "renda", nome: "Auxílio-Inclusão", popular: "o auxílio de quem tinha BPC e começou a trabalhar",
+      id: "FED-RENDA-005", onde: ["cras", "dpu"], area: "renda", nome: "Auxílio-Inclusão", popular: "o auxílio de quem tinha BPC e começou a trabalhar",
       esfera: "Federal", orgao: "INSS", verificado: "06/09/2026", vencido: false,
       regras: [
         { tipo: "deficiencia" },
@@ -1367,7 +1376,7 @@ main { display:block; }
     },
 
     "est-transporte-006-ipva-pr": {
-      id: "EST-TRANSP-006", area: "transporte", nome: "Isenção de IPVA para pessoa com deficiência, no Paraná",
+      id: "EST-TRANSP-006", onde: ["dpe-ldna"], area: "transporte", nome: "Isenção de IPVA para pessoa com deficiência, no Paraná",
       popular: "não pagar o IPVA do carro", esfera: "Estadual, Paraná", orgao: "Receita Estadual do Paraná e Detran-PR",
       verificado: "06/09/2026", vencido: false,
       regras: [
@@ -1433,7 +1442,7 @@ main { display:block; }
     },
 
     "mun-transporte-007-passe-londrina": {
-      id: "MUN-TRANSP-007", area: "transporte", nome: "Transporte coletivo gratuito em Londrina",
+      id: "MUN-TRANSP-007", onde: ["tcgl-terminal", "tcgl-loja", "cmtu"], area: "transporte", nome: "Transporte coletivo gratuito em Londrina",
       popular: "passe livre do ônibus da cidade, isenção tarifária, cartão transporte",
       esfera: "Municipal, Londrina", orgao: "CMTU e TCGL, sob as leis municipais de Londrina",
       verificado: "07/09/2026", vencido: false,
@@ -1492,8 +1501,6 @@ main { display:block; }
           c: "norma", f: "ldna-servico", v: "2026-09-07", ate: "2027-09-07" }
       ],
       canais: [
-        ["TCGL, Terminal Urbano Central", "Avenida São Paulo, 10. Segunda a sexta, das 8h às 17h.", null, null],
-        ["TCGL, Loja de Créditos", "Rua Quintino Bocaiúva, 351. Segunda a sexta, das 8h às 17h.", null, null],
         ["CMTU, isenções tarifárias", "Regras, endereços e horários do atendimento.", null, "https://cmtu.londrina.pr.gov.br/index.php/isencoes-tarifarias.html"],
         ["Carta de serviços da Prefeitura de Londrina", "Descrição do serviço no portal do município.", null, "https://servicos.londrina.pr.gov.br/Servico/Details/570"]
       ],
@@ -1505,7 +1512,7 @@ main { display:block; }
     },
 
     "est-saude-008-ceaf-pr": {
-      id: "EST-SAUDE-008", area: "saude", nome: "Medicamento de alto custo pela Farmácia do Paraná",
+      id: "EST-SAUDE-008", onde: ["farmacia-ldna", "dpe-ldna"], area: "saude", nome: "Medicamento de alto custo pela Farmácia do Paraná",
       popular: "remédio de alto custo do SUS, CEAF", esfera: "Estadual, Paraná", orgao: "Secretaria de Estado da Saúde do Paraná",
       verificado: "06/09/2026", vencido: false,
       regras: [
@@ -1567,7 +1574,7 @@ main { display:block; }
     },
 
     "fed-escola-009-aee": {
-      id: "FED-ESCOLA-009", area: "escola", nome: "Atendimento Educacional Especializado na escola",
+      id: "FED-ESCOLA-009", onde: ["educacao-ldna", "dpe-ldna"], area: "escola", nome: "Atendimento Educacional Especializado na escola",
       popular: "AEE, sala de recursos, professor de apoio", esfera: "Federal, executado pela rede de ensino",
       orgao: "Escola e secretaria de educação, municipal ou estadual", verificado: "06/09/2026", vencido: false,
       regras: [
@@ -1808,6 +1815,79 @@ main { display:block; }
       }).join("") + '</ul>' +
       '<p class="rr-foot">Calculado a partir do mapa deste benefício, não atribuído à mão. A divisão em três custos segue o modelo de custo administrativo de Herd e Moynihan, e a comparação é entre os benefícios desta versão.</p>' +
       '</div>';
+  }
+
+  /* ---------- onde ir: endereço e telefone de cada local citado ----------
+     Só entra aqui dado copiado de página oficial, com a data em que foi
+     conferido. Contato muda mais rápido que norma: se o órgão não publica o
+     endereço, o site manda para a página oficial em vez de adivinhar. */
+  var LOCAIS_CONFERIDO = "12/09/2026";
+  var CRAS_PAGINA = "https://portal.londrina.pr.gov.br/unidades-de-protecao-social-basica/cras";
+  var CRAS_MAPA = "https://www.google.com/maps/d/viewer?mid=1xm_Rk2lNqrURQQkg6XvzOVICvEGBE1w";
+  var CRAS_LDNA = [
+    { nome: "CRAS Centro A", endereco: "Rua Ermelindo Leão, 270 – Jd. Parque das Águias", tel: ["(43) 3378-0393"] },
+    { nome: "CRAS Centro B", endereco: "Rua Maria José Carneiro, 55 – Monte Carlo", tel: ["(43) 3378-0438"] },
+    { nome: "CRAS Leste", endereco: "Rua Tamarino, 136 – Jd. Marabá", tel: ["(43) 3378-0412"] },
+    { nome: "CRAS Norte A", endereco: "Rua Julieta Leite de Carvalho, 65 – Conj. José Giordano", tel: ["(43) 3378-0388"] },
+    { nome: "CRAS Norte B", endereco: "Rua Lino Sachentin, 524 – Conj. Luiz de Sá", tel: ["(43) 3378-0389"] },
+    { nome: "CRAS Oeste A", endereco: "Rua Adelina Piqueti Barrios, 230 – Jd. Maracanã", tel: ["(43) 3378-0430"] },
+    { nome: "CRAS Oeste B", endereco: "Rua Angelo Gaioto, s/n – Jd. Santa Rita I", tel: ["(43) 3378-0598"] },
+    { nome: "CRAS Sul A", endereco: "Av. Guilherme de Almeida, 2260 – Jd. Franciscato I", tel: ["(43) 3378-0391"] },
+    { nome: "CRAS Sul B", endereco: "Rua Lírios dos Vales, 59 – Pq. das Indústrias", tel: ["(43) 3378-0561"] },
+    { nome: "CRAS Rural", endereco: "Rua Pedro Martins, 176 – Conj. Hab. Saltinho", tel: ["(43) 3378-0588"] }
+  ];
+  var LOCAIS = {
+    "copel-ldna": { nome: "Agência da Copel em Londrina", endereco: "Rua Pará, 1225 – Centro",
+      tel: ["0800 51 00 116"], horario: "Segunda a sexta, das 8h às 17h",
+      url: "https://www.copel.com/site/copel-distribuicao/agencias-de-atendimento/" },
+    "tcgl-terminal": { nome: "TCGL, Terminal Urbano Central", endereco: "Av. São Paulo, 10 – Centro",
+      tel: ["0800 400 7020"], horario: "Segunda a sexta, das 8h às 17h",
+      url: "https://cmtu.londrina.pr.gov.br/index.php/isencoes-tarifarias.html" },
+    "tcgl-loja": { nome: "TCGL, Loja de Créditos", endereco: "Rua Quintino Bocaiúva, 351 – Centro",
+      tel: ["(43) 3378-2500"], horario: "Segunda a sexta, das 8h às 17h" },
+    "cmtu": { nome: "CMTU, atendimento ao público", endereco: "Rua Prof. João Cândido, 1213 – Centro",
+      tel: ["(43) 3379-7900"], horario: "Segunda a sexta, das 8h às 17h",
+      url: "https://cmtu.londrina.pr.gov.br/index.php/informacoes-gerais/enderecos-telefones-e-horario-de-funcionamento.html" },
+    "farmacia-ldna": { nome: "Farmácia do Paraná, 17ª Regional de Saúde", endereco: "Alameda Miguel Blasi, 56",
+      tel: ["(43) 3344-6383", "(43) 99992-1677"],
+      url: "https://www.saude.pr.gov.br/Endereco/Farmacia-do-Parana-Londrina" },
+    "dpe-ldna": { nome: "Defensoria Pública do Paraná em Londrina", endereco: "Av. Bandeirantes, 263 – Vila Ipiranga",
+      tel: ["(43) 3521-3703"], horario: "Segunda a quinta, das 13h às 17h",
+      url: "https://www.defensoriapublica.pr.def.br/Pagina/Londrina" },
+    "educacao-ldna": { nome: "Secretaria Municipal de Educação", endereco: "Rua Humaitá, 900 – Jardim Kennedy",
+      tel: ["(43) 3771-6350"], horario: "Segunda a sexta, das 8h às 12h e das 13h30 às 17h30",
+      url: "https://portal.londrina.pr.gov.br/localizacao-contatos-educacao" },
+    "dpu": { nome: "Defensoria Pública da União",
+      url: "https://www.dpu.def.br/contatos-dpu", urlRotulo: "Ver endereço e telefone da unidade de Londrina" }
+  };
+  function telLink(t) { var d = String(t).replace(/\D/g, ""); return d.indexOf("0800") === 0 ? "tel:" + d : "tel:+55" + d; }
+  function cartaoLocal(l) {
+    return '<li class="local"><strong class="local__nome">' + esc(l.nome) + '</strong>' +
+      (l.endereco ? '<span class="local__end">' + esc(l.endereco) + '</span>' : '') +
+      (l.tel ? '<span class="local__tel">' + l.tel.map(function (t) { return '<a href="' + telLink(t) + '">' + esc(t) + '</a>'; }).join(" · ") + '</span>' : '') +
+      (l.horario ? '<span class="local__hor">' + esc(l.horario) + '</span>' : '') +
+      (l.url ? '<a class="local__site" href="' + esc(l.url) + '" target="_blank" rel="noopener noreferrer">' +
+        esc(l.urlRotulo || "Página oficial") + svg("ext") + '<span class="vh">, abre em outra aba</span></a>' : '') +
+      '</li>';
+  }
+  function blocoOnde(b) {
+    var ids = b.onde || [];
+    if (!ids.length) return "";
+    if (resp.municipio && resp.municipio !== "londrina")
+      return '<h2 class="upper">Onde ir</h2><p class="rr-foot">Os endereços desta versão são de Londrina. Na sua cidade, a prefeitura informa onde fica o CRAS mais perto.</p>';
+    var itens = "", cras = "";
+    ids.forEach(function (id) {
+      if (id === "cras") {
+        cras = '<details class="details"><summary>' + svg("fwd") + 'Ver os 10 CRAS de Londrina</summary><div class="details__body">' +
+          '<p class="rr-foot">Cada CRAS atende uma região, todos de segunda a sexta, das 8h às 17h. ' +
+          '<a href="' + CRAS_MAPA + '" target="_blank" rel="noopener noreferrer">Descubra o seu digitando o endereço no mapa da Prefeitura' +
+          svg("ext") + '<span class="vh">, abre em outra aba</span></a></p>' +
+          '<ul class="locais">' + CRAS_LDNA.map(cartaoLocal).join("") + '</ul></div></details>';
+      } else if (LOCAIS[id]) itens += cartaoLocal(LOCAIS[id]);
+    });
+    return '<h2 class="upper">Onde ir em Londrina</h2>' +
+      (itens ? '<ul class="locais">' + itens + '</ul>' : '') + cras +
+      '<p class="rr-foot">Endereços e telefones copiados das páginas oficiais em ' + LOCAIS_CONFERIDO + '. Ligue antes de ir: horário muda.</p>';
   }
 
   /* pré-requisitos compartilhados: é o que permite calcular por onde começar */
@@ -2425,7 +2505,7 @@ main { display:block; }
       '<h2 class="upper">Valor do benefício</h2><p>' + b.parametro + '</p><p><strong>O ACESSA+ não calcula quanto você vai receber.</strong> Ver estimativa de valor só na fonte oficial.</p>' +
       '<h2 class="upper">Passo a passo</h2><p class="rr-foot">Siga na ordem. Cada passo termina numa ação: abrir o serviço, ligar de graça, ou a lista do que levar. O detalhe fica a um clique.</p>' +
       '<ol class="steplist">' + etapas + '</ol>' +
-      '<h2 class="upper">Quem pode te ajudar</h2><p class="rr-foot">Você não precisa fazer isto sozinho. Todos abaixo atendem de graça.</p><ul>' + ajuda + '</ul>' +
+      blocoOnde(b) + '<h2 class="upper">Quem pode te ajudar</h2><p class="rr-foot">Você não precisa fazer isto sozinho. Todos abaixo atendem de graça.</p><ul>' + ajuda + '</ul>' +
       juris +
       '<h2 class="upper">Se travar</h2><p>' + b.travar + '</p>' +
       '<h2 class="upper">Fique atento</h2><ul>' + alertas + '</ul>' +
@@ -2759,6 +2839,16 @@ main { display:block; }
     L.push("ONDE RESOLVER");
     b.canais.forEach(function (c) { L.push("• " + c[0] + ": " + c[1] + (c[2] ? " (" + c[2] + ")" : "")); });
     L.push("");
+    if ((b.onde || []).length && (!resp.municipio || resp.municipio === "londrina")) {
+      L.push("ONDE IR EM LONDRINA");
+      b.onde.forEach(function (id) {
+        if (id === "cras") { L.push("• CRAS: 10 unidades, de segunda a sexta, das 8h às 17h. Veja o seu: " + CRAS_PAGINA); return; }
+        var l = LOCAIS[id]; if (!l) return;
+        L.push("• " + l.nome + (l.endereco ? ", " + l.endereco : "") + (l.tel ? ". Tel: " + l.tel.join(" / ") : "") +
+          (l.horario ? ". " + l.horario : "") + (!l.endereco && l.url ? ": " + l.url : ""));
+      });
+      L.push("");
+    }
     L.push("AJUDA DE GRAÇA");
     b.ajuda.forEach(function (a) { L.push("• " + a[0] + ": " + a[1]); });
     L.push("");
