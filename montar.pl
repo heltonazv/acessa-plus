@@ -2,7 +2,7 @@ use strict; use warnings;
 # Gera index.html a partir do artefato, trocando o Google Fonts por fonte local.
 # É a única diferença entre a versão publicada como artifact e a que vai ao ar.
 
-my $src = shift or die "uso: montar.pl <arquivo-origem.html>\n";
+my $src = shift || 'fonte/acessa.html';   # a fonte vive no repositório
 open my $fh, '<:raw', $src or die "$src: $!";
 my $c = do { local $/; <$fh> }; close $fh;
 

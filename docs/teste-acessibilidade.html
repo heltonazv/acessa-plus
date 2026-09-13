@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste de Acessibilidade do ACESSA+</title>
+<meta name="description" content="Protocolo de avaliação em duas trilhas: conformidade técnica pelo WCAG-EM e teste com pessoas com deficiência, com roteiro de sessão, matriz de recrutamento e ficha de registro.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+/* ============================================================
+   Teste de Acessibilidade do ACESSA+
+   Instrumento de campo, não relatório: prancheta, casas de
+   marcação, roteiro falado, ficha de registro. Slab serif nos
+   títulos, como cabeçalho de formulário carimbado; sans de
+   leitura para o corpo, porque isto é escaneado em sessão.
+   ============================================================ */
+:root {
+  --ground:#EDF0F4; --surface:#FFFFFF; --sunk:#E0E5EC; --rule:#C3CBD6;
+  --rule-firm:#93A0B2; --ink:#141A24; --ink-2:#4E5A6B;
+  --accent:#334EA8; --accent-soft:#E1E7F7;
+  --amber:#8A5200; --amber-soft:#FBEEDA;
+  --alert:#9C2033; --alert-soft:#FAE3E6;
+  --display:"Bitter", Georgia, serif;
+  --body:"Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --measure:36rem; --wide:58rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:#111620; --surface:#19202B; --sunk:#0C1017; --rule:#2A3340;
+    --rule-firm:#4B5768; --ink:#E7ECF3; --ink-2:#9EAABB;
+    --accent:#8FA9F0; --accent-soft:#18223A;
+    --amber:#E0AC5C; --amber-soft:#2A2113;
+    --alert:#F0949F; --alert-soft:#2E161B;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:#111620; --surface:#19202B; --sunk:#0C1017; --rule:#2A3340;
+  --rule-firm:#4B5768; --ink:#E7ECF3; --ink-2:#9EAABB;
+  --accent:#8FA9F0; --accent-soft:#18223A;
+  --amber:#E0AC5C; --amber-soft:#2A2113;
+  --alert:#F0949F; --alert-soft:#2E161B;
+}
+
+* { box-sizing:border-box; }
+body { margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--body); font-size:17px; line-height:1.6; }
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{ transition-duration:.001ms!important; animation-duration:.001ms!important; } }
+
+.wrap { max-width:var(--measure); margin:0 auto; padding:0 1.5rem; }
+.wrap--wide { max-width:var(--wide); }
+
+h1,h2,h3 { font-family:var(--display); font-weight:700; line-height:1.18; margin:0; text-wrap:balance; }
+h1 { font-size:clamp(1.95rem,1.4rem+2.3vw,2.9rem); letter-spacing:-.018em; }
+h2 { font-size:clamp(1.35rem,1.15rem+.85vw,1.75rem); }
+h3 { font-size:1.1rem; font-weight:600; font-family:var(--body); letter-spacing:.005em; }
+p { margin:0; }
+a { color:var(--accent); text-underline-offset:.16em; }
+strong { font-weight:700; }
+code, .mono { font-family:var(--mono); font-size:.85em; }
+code { background:var(--sunk); padding:.1em .34em; }
+
+.eyebrow { font-family:var(--body); font-size:.72rem; font-weight:700;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--ink-2); }
+
+.head { background:var(--surface); border-bottom:3px solid var(--ink); }
+.head .wrap { padding-block:3.2rem 2rem; display:flex; flex-direction:column; gap:.95rem; }
+.head h1 { max-width:16ch; }
+.head .sub { font-size:1.12rem; color:var(--ink-2); max-width:44ch; }
+
+.ficha { background:var(--sunk); border-bottom:1px solid var(--rule); }
+.ficha .wrap { padding-block:.9rem; display:grid; gap:.7rem 2rem;
+  grid-template-columns:repeat(auto-fit,minmax(12rem,1fr)); }
+.ficha dt { font-size:.66rem; font-weight:700; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-2); margin-bottom:.15rem; }
+.ficha dd { margin:0; font-family:var(--mono); font-size:.8rem; }
+
+main { padding-bottom:5rem; }
+section { padding-top:3rem; }
+.stack { display:flex; flex-direction:column; gap:1rem; }
+h2 + .stack, h3 + .stack { margin-top:.85rem; }
+.lede { font-size:1.08rem; }
+
+/* ---- casas de marcação: isto é para ser usado em sessão ---- */
+ul.check { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.55rem; }
+ul.check > li { display:grid; grid-template-columns:1.35rem 1fr; gap:.7rem; align-items:start; }
+ul.check > li::before { content:""; width:1.15rem; height:1.15rem; margin-top:.2rem;
+  border:2px solid var(--rule-firm); background:var(--surface); }
+
+ul.pontos { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.6rem; }
+ul.pontos > li { padding-left:1.1rem; position:relative; }
+ul.pontos > li::before { content:""; position:absolute; left:0; top:.6em;
+  width:.38rem; height:.38rem; background:var(--rule-firm); }
+
+/* ---- blocos ---- */
+.bloco { background:var(--surface); border:1px solid var(--rule); padding:1.2rem 1.35rem; }
+.bloco--accent { border-left:5px solid var(--accent); }
+.bloco--amber { background:var(--amber-soft); border-color:var(--amber); border-left-width:5px; }
+.bloco--alert { background:var(--alert-soft); border-color:var(--alert); border-left-width:5px; }
+.bloco h3 { margin-bottom:.45rem; }
+.bloco--amber h3 { color:var(--amber); }
+.bloco--alert h3 { color:var(--alert); }
+
+/* ---- fala do moderador ---- */
+.fala { border-left:4px solid var(--rule-firm); padding:.15rem 0 .15rem 1rem; margin:.6rem 0;
+  font-style:italic; color:var(--ink); }
+.fala::before { content:"“"; }
+.fala::after { content:"”"; }
+
+/* ---- passos numerados: o WCAG-EM é sequência de verdade ---- */
+ol.passos { list-style:none; counter-reset:p; margin:0; padding:0;
+  display:flex; flex-direction:column; gap:1.15rem; }
+ol.passos > li { counter-increment:p; display:grid; grid-template-columns:2.2rem 1fr;
+  gap:.9rem; align-items:start; }
+ol.passos > li::before { content:"P" counter(p); font-family:var(--mono); font-weight:500;
+  font-size:.82rem; color:var(--surface); background:var(--accent);
+  width:2.2rem; height:1.6rem; display:grid; place-items:center; margin-top:.15rem; }
+ol.passos h3 { margin-bottom:.2rem; }
+
+/* ---- tabela ---- */
+.tab-wrap { overflow-x:auto; border:1px solid var(--rule); background:var(--surface); }
+table { border-collapse:collapse; width:100%; min-width:36rem; font-size:.9rem; }
+caption { text-align:left; font-size:.7rem; font-weight:700; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-2); padding:.85rem 1rem .5rem; }
+th, td { text-align:left; padding:.6rem 1rem; border-top:1px solid var(--rule); vertical-align:top; }
+th { font-size:.74rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); }
+td.mono { font-family:var(--mono); font-size:.8rem; }
+tbody tr:nth-child(odd) td { background:color-mix(in srgb, var(--sunk) 40%, transparent); }
+
+/* ---- ficha de registro: linhas para preencher ---- */
+.registro { background:var(--surface); border:1px solid var(--rule); padding:1.25rem 1.35rem; }
+.registro dl { display:grid; grid-template-columns:minmax(9rem,auto) 1fr; gap:.85rem 1rem; margin:0; }
+.registro dt { font-size:.8rem; font-weight:700; color:var(--ink-2); padding-top:.2rem; }
+.registro dd { margin:0; border-bottom:1.5px solid var(--rule-firm); min-height:1.7rem; }
+
+figure { margin:0; }
+.fig { overflow-x:auto; background:var(--surface); border:1px solid var(--rule); padding:1.3rem 1.2rem; }
+.fig svg { display:block; max-width:100%; height:auto; min-width:29rem; color:var(--ink); }
+figcaption { font-size:.88rem; color:var(--ink-2); margin-top:.65rem; max-width:46ch; }
+.s-lab { font-family:"Public Sans", Arial, sans-serif; font-size:12px; font-weight:700; fill:currentColor; }
+.s-sub { font-family:"Public Sans", Arial, sans-serif; font-size:10.5px; fill:var(--ink-2); }
+.s-edge { font-family:"JetBrains Mono", monospace; font-size:9.5px; fill:var(--ink-2); }
+
+footer { border-top:3px solid var(--ink); margin-top:3.5rem; padding-top:1.4rem; }
+footer p { font-size:.86rem; color:var(--ink-2); }
+a:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+</style>
+
+<header class="head">
+  <div class="wrap">
+    <p class="eyebrow">Instrumento de campo · artefato de tese</p>
+    <h1>Teste de Acessibilidade do ACESSA+</h1>
+    <p class="sub">Protocolo em duas trilhas: conformidade técnica pelo WCAG-EM e sessões com pessoas com deficiência. Feito para ser aplicado, não lido.</p>
+  </div>
+</header>
+
+<div class="ficha">
+  <dl class="wrap wrap--wide">
+    <div><dt>Versão</dt><dd>1.0 · 07/09/2026</dd></div>
+    <div><dt>Meta</dt><dd>WCAG 2.2 AA · eMAG 3.1</dd></div>
+    <div><dt>Trilhas</dt><dd>técnica + com usuários</dd></div>
+    <div><dt>Status</dt><dd>aguarda aprovação do CEP</dd></div>
+  </dl>
+</div>
+
+<main>
+
+  <section class="wrap">
+    <h2>Por que duas trilhas</h2>
+    <div class="stack">
+      <p class="lede">Auditoria técnica e teste com usuários encontram coisas diferentes. Uma página pode passar em todos os critérios do WCAG e ainda assim ser inutilizável por quem depende de leitor de tela, porque conformidade mede a presença dos requisitos, não o sucesso da tarefa.</p>
+      <p>O próprio W3C recomenda envolver pessoas com deficiência na avaliação, para alcançar a experiência real de uso. Num artefato cujo público <em>é</em> pessoa com deficiência, declarar conformidade sem sessão com usuário é o elo fraco da metodologia.</p>
+    </div>
+  </section>
+
+  <section class="wrap wrap--wide">
+    <div class="stack">
+      <figure>
+        <div class="fig">
+          <svg viewBox="0 0 700 250" role="img" aria-label="Duas trilhas independentes: a avaliação técnica pelo WCAG-EM produz não conformidades, e as sessões com usuários produzem barreiras de tarefa. As duas alimentam um mesmo registro de achados, mas cada uma detecta o que a outra não alcança.">
+            <defs>
+              <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+              </marker>
+            </defs>
+
+            <rect x="0" y="34" width="230" height="74" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <text x="16" y="60" class="s-lab">Trilha A · WCAG-EM</text>
+            <text x="16" y="79" class="s-sub">amostra de páginas, critério a critério</text>
+            <text x="16" y="95" class="s-sub">avaliador técnico</text>
+
+            <rect x="0" y="140" width="230" height="74" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <text x="16" y="166" class="s-lab">Trilha B · sessões</text>
+            <text x="16" y="185" class="s-sub">12 participantes com deficiência</text>
+            <text x="16" y="201" class="s-sub">tarefa real, tecnologia assistiva própria</text>
+
+            <path d="M230 71 L330 108" stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#a1)"/>
+            <text x="238" y="82" class="s-edge">não conformidades</text>
+            <path d="M230 177 L330 140" stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#a1)"/>
+            <text x="238" y="196" class="s-edge">barreiras de tarefa</text>
+
+            <rect x="332" y="98" width="180" height="52" fill="none" stroke="#334EA8" stroke-width="2"/>
+            <text x="422" y="120" class="s-lab" text-anchor="middle" fill="#334EA8">Registro único</text>
+            <text x="422" y="137" class="s-sub" text-anchor="middle">de achados</text>
+
+            <path d="M512 124 L588 124" stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#a1)"/>
+            <rect x="590" y="98" width="110" height="52" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <text x="645" y="120" class="s-lab" text-anchor="middle">Correção</text>
+            <text x="645" y="137" class="s-sub" text-anchor="middle">e reteste</text>
+
+            <text x="0" y="20" class="s-edge">Nenhuma das duas substitui a outra. A auditoria não vê a pessoa desistir; a sessão não cobre todos os critérios.</text>
+            <text x="332" y="176" class="s-edge">Cada achado guarda a trilha de origem,</text>
+            <text x="332" y="190" class="s-edge">para não confundir defeito técnico</text>
+            <text x="332" y="204" class="s-edge">com problema de compreensão.</text>
+          </svg>
+        </div>
+        <figcaption>As trilhas rodam em paralelo e não se substituem. A distinção importa no relato: um critério reprovado é defeito; uma pessoa que abandona a tarefa com a página conforme é problema de projeto.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Trilha A · Conformidade pelo WCAG-EM</h2>
+    <div class="stack">
+      <p>Os cinco passos abaixo seguem a metodologia do W3C para avaliação de conformidade. O que muda de um projeto para outro é o escopo e a amostra, então os dois vêm preenchidos.</p>
+      <ol class="passos">
+        <li>
+          <div>
+            <h3>Definir o escopo</h3>
+            <p>Alvo: WCAG 2.2 nível AA, mais eMAG 3.1. Tecnologias assumidas: HTML, CSS e JavaScript. Avaliar em pelo menos dois navegadores e dois sistemas, incluindo um celular Android de baixo custo, que é o aparelho do público.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Explorar o artefato</h3>
+            <p>Inventário: início; partes 1, 2 e 3 do questionário; conferência de respostas; resultado; nove páginas de benefício; sobre; autoteste; página não encontrada. Estados adicionais: erro de validação, leitura fácil, alto contraste, texto ampliado em quatro níveis e a versão de impressão.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Selecionar a amostra</h3>
+            <p><strong>Estruturada:</strong> início, parte 1 (escala do Washington Group), parte 2 (renda, a tela mais densa), conferência, resultado, página do BPC (a mais longa) e sobre. <strong>Aleatória:</strong> duas outras páginas de benefício sorteadas, mais um estado de erro de validação.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Avaliar</h3>
+            <p>Cada página da amostra contra cada critério do nível AA. Registrar critério, página, estado, evidência e severidade. Verificar em teclado, em leitor de tela, em zoom de 400 por cento e em modo de alto contraste do sistema operacional.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3>Relatar</h3>
+            <p>Declaração de conformidade com escopo, data, amostra, método e resultado por critério. Sem escopo e amostra declarados, a afirmação de conformidade não é verificável por terceiros.</p>
+          </div>
+        </li>
+      </ol>
+      <div class="bloco bloco--amber">
+        <h3>Pontos que já sabemos que precisam de atenção</h3>
+        <p>A análise de código já apontou candidatos concretos. Verificar em especial: associação de erro ao campo, ausência de <code>aria-required</code>, rótulo visível diferente do nome acessível no campo de renda, semântica de grupo nas perguntas de opção, e o anúncio do contador de pessoas na casa.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap wrap--wide">
+    <h2>Trilha B · Sessões com participantes</h2>
+    <div class="stack">
+      <p>Doze participantes é o número de referência para teste moderado que precisa cobrir uma faixa de deficiências e tecnologias assistivas distintas. Se o orçamento não permitir, dois ou três ainda é melhor que nenhum — e não anula o resultado, desde que o relato diga quantos foram.</p>
+
+      <div class="tab-wrap">
+        <table>
+          <caption>Matriz de recrutamento · estratos e tecnologia assistiva</caption>
+          <thead>
+            <tr><th scope="col">Estrato</th><th scope="col">Alvo</th><th scope="col">Tecnologia esperada</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Visual, cegueira</td><td class="mono">2</td><td>NVDA no computador, TalkBack no Android</td></tr>
+            <tr><td>Visual, baixa visão</td><td class="mono">2</td><td>ampliação do sistema, alto contraste, zoom do navegador</td></tr>
+            <tr><td>Auditiva</td><td class="mono">1</td><td>Libras; verificar dependência de áudio e de leitura</td></tr>
+            <tr><td>Motora</td><td class="mono">2</td><td>somente teclado, acionador, controle por voz</td></tr>
+            <tr><td>Intelectual ou cognitiva</td><td class="mono">2</td><td>leitura fácil, apoio de terceiro</td></tr>
+            <tr><td>Familiar cuidador</td><td class="mono">2</td><td>uso em nome de outra pessoa, celular simples</td></tr>
+            <tr><td>Agente comunitário</td><td class="mono">1</td><td>uso em campo, conexão instável</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bloco bloco--accent">
+        <h3>Regras de recrutamento</h3>
+        <ul class="pontos">
+          <li>Participantes com <strong>domínio médio ou alto</strong> da própria tecnologia assistiva. Quem está aprendendo a usar o leitor de tela testa o leitor, não o site.</li>
+          <li>Cada pessoa usa <strong>o próprio equipamento e a própria configuração</strong>. Registrar produto e versão.</li>
+          <li>Nenhum participante deve ter participado do desenho do artefato.</li>
+          <li>Incluir pelo menos duas pessoas com baixa escolaridade, porque a barreira de leitura é tão determinante quanto a técnica.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>As seis tarefas</h2>
+    <div class="stack">
+      <p>Cada tarefa é dada em situação, nunca em termos de interface. Não se diz “clique em resultado”: diz-se o que a pessoa quer resolver.</p>
+      <ol class="passos">
+        <li><div><h3>Descobrir se há algum direito</h3><p class="fala">A sua filha de nove anos tem muita dificuldade para andar. Você quer saber se ela tem direito a alguma coisa. Use o site como usaria em casa.</p></div></li>
+        <li><div><h3>Saber o que levar</h3><p class="fala">Você decidiu tentar o BPC. Descubra o que precisa levar quando for ao CRAS.</p></div></li>
+        <li><div><h3>Guardar para levar ou enviar</h3><p class="fala">Você quer que a sua irmã, que mora longe, veja essas informações. Faça isso do jeito que preferir.</p></div></li>
+        <li><div><h3>Decidir por onde começar</h3><p class="fala">Apareceram vários direitos. Descubra qual é o primeiro passo que você deve dar.</p></div></li>
+        <li><div><h3>Ajustar a leitura</h3><p class="fala">Deixe a página do jeito que fica mais confortável para você ler.</p></div></li>
+        <li><div><h3>Corrigir uma resposta</h3><p class="fala">Você percebeu que errou a idade. Corrija sem começar tudo de novo.</p></div></li>
+      </ol>
+      <div class="bloco bloco--alert">
+        <h3>O que não medir</h3>
+        <p>Não cronometrar tarefa e não usar tempo como critério de sucesso. Pessoa com deficiência opera em ritmo próprio, e tempo mede a tecnologia assistiva, não o artefato. Medir <strong>conclusão</strong>, <strong>barreiras encontradas</strong> e <strong>assistências necessárias</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Condução da sessão</h2>
+    <div class="stack">
+      <p>Protocolo de pensar alto, com intervenção alta do moderador — diferente de um teste de usabilidade comum, onde se intervém pouco. Aqui o objetivo é entender <em>onde</em> a barreira aparece, e para isso é preciso perguntar.</p>
+      <h3>Abertura</h3>
+      <p class="fala">Quem está sendo avaliado é o site, nunca você. Se travar em alguma parte, isso é uma informação útil para nós, não um erro seu. Pode desistir de qualquer tarefa e pode parar quando quiser.</p>
+      <h3>Durante</h3>
+      <ul class="pontos">
+        <li>Pedir para narrar o que está procurando e o que espera encontrar.</li>
+        <li>Quando travar, esperar. Só depois perguntar: <em>o que você está tentando fazer agora?</em></li>
+        <li>Registrar o momento exato da barreira e o que estava na tela ou no áudio.</li>
+        <li>Assistência só depois de registrada a tentativa, e anotada como assistência.</li>
+      </ul>
+      <h3>Acomodações</h3>
+      <ul class="check">
+        <li>Reservar 25 por cento a mais de tempo para instalação e ajustes.</li>
+        <li>Perguntar antes qual formato de convite e de termo a pessoa prefere.</li>
+        <li>Oferecer intervalo a cada 20 minutos, sem precisar pedir.</li>
+        <li>Intérprete de Libras contratado quando houver participante surdo.</li>
+        <li>Alternativa remota para quem tem dificuldade de deslocamento.</li>
+        <li>Ressarcimento de transporte e do tempo do participante.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap wrap--wide">
+    <h2>Ficha de registro por sessão</h2>
+    <div class="stack">
+      <div class="registro">
+        <dl>
+          <dt>Sessão nº / data</dt><dd></dd>
+          <dt>Estrato</dt><dd></dd>
+          <dt>Tecnologia assistiva, produto e versão</dt><dd></dd>
+          <dt>Navegador e sistema</dt><dd></dd>
+          <dt>Tarefas concluídas sem assistência</dt><dd></dd>
+          <dt>Tarefas concluídas com assistência</dt><dd></dd>
+          <dt>Tarefas abandonadas</dt><dd></dd>
+          <dt>Barreiras registradas</dt><dd></dd>
+          <dt>Critério WCAG relacionado, se houver</dt><dd></dd>
+          <dt>Observações do participante</dt><dd></dd>
+        </dl>
+      </div>
+      <div class="tab-wrap">
+        <table>
+          <caption>Tipos de barreira · use estes rótulos para que o resultado seja contável</caption>
+          <thead>
+            <tr><th scope="col">Rótulo</th><th scope="col">Quando usar</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="mono">nao_percebeu</td><td>O elemento estava lá e a pessoa não o encontrou.</td></tr>
+            <tr><td class="mono">nao_entendeu</td><td>Encontrou, mas não compreendeu o que significava ou o que fazer.</td></tr>
+            <tr><td class="mono">nao_operou</td><td>Entendeu, mas não conseguiu acionar com a sua tecnologia.</td></tr>
+            <tr><td class="mono">perdeu_contexto</td><td>Perdeu a noção de onde estava, ou o foco saltou sem aviso.</td></tr>
+            <tr><td class="mono">informacao_ausente</td><td>Precisava de uma informação que o artefato não dá.</td></tr>
+            <tr><td class="mono">desistiu</td><td>Interrompeu a tarefa por esforço ou frustração.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Os mesmos rótulos servem à tipificação das dificuldades comuns do próprio artefato. Um achado de sessão pode virar conteúdo: se três participantes não entendem a régua de renda, isso é defeito de projeto e vira item de correção, não nota de rodapé.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Ética e dados</h2>
+    <div class="stack">
+      <div class="bloco bloco--alert">
+        <h3>Nada começa antes da aprovação</h3>
+        <p>Pesquisa com seres humanos, com participantes que são pessoas com deficiência, exige submissão ao CEP e possivelmente à CONEP. Isso é caminho crítico do cronograma, não formalidade final.</p>
+      </div>
+      <ul class="check">
+        <li>TCLE em formato acessível: leitura fácil, áudio, e versão em Libras.</li>
+        <li>Consentimento registrado da forma que o participante conseguir dar, não apenas assinatura.</li>
+        <li>Gravação só com autorização específica, separada da autorização de participação.</li>
+        <li>Nenhuma resposta de triagem real é coletada: as sessões usam perfis fictícios fornecidos pelo moderador.</li>
+        <li>Dados de sessão pseudonimizados, sem nome, sem endereço, sem diagnóstico.</li>
+        <li>Direito de retirar o consentimento depois da sessão, com prazo declarado.</li>
+      </ul>
+      <div class="bloco bloco--accent">
+        <h3>Uma decisão de desenho que simplifica a ética</h3>
+        <p>As tarefas usam <strong>perfis fictícios</strong>, entregues em cartão pelo moderador. O participante nunca informa a própria renda nem a própria condição de saúde. Isso mantém a sessão fora do território de dado pessoal sensível e evita que a pessoa precise se expor para ajudar a testar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>O que conta como resultado</h2>
+    <div class="stack">
+      <p>A declaração de acessibilidade do artefato passa a ter três partes, e as três precisam estar preenchidas para que a afirmação seja verificável:</p>
+      <ul class="pontos">
+        <li><strong>Conformidade.</strong> Resultado por critério na amostra declarada, com data e escopo.</li>
+        <li><strong>Uso real.</strong> Número de participantes, estratos cobertos, tecnologias usadas, tarefas concluídas e barreiras por tipo.</li>
+        <li><strong>O que foi corrigido.</strong> Cada barreira registrada com decisão: corrigida, em correção, ou não corrigida com justificativa.</li>
+      </ul>
+      <p>Enquanto isso não existir, o rodapé do artefato deve dizer <em>meta de conformidade</em>, e não conformidade. É o que ele diz hoje, e está correto.</p>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <p>Protocolo de avaliação de acessibilidade do ACESSA+ · doutorado profissional, Universidade Positivo, com apoio do ecohub espaço maker. Segue a metodologia de avaliação de conformidade do W3C e a orientação corrente sobre teste de usabilidade com participantes com deficiência. Versão 1.0, 07/09/2026.</p>
+  </footer>
+
+</main>
+
+</html>

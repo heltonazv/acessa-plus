@@ -12,12 +12,15 @@ Um site estático de arquivo único. Não há build, não há back-end, não há
 O `index.html` carrega sozinho e funciona offline depois da primeira visita.
 
 ```
-index.html        a aplicação inteira: conteúdo, motor de decisão e interface
-fontes/           Poppins hospedada aqui, para não entregar o IP de quem visita
-                  a um servidor de terceiro
-netlify.toml      publicação, cabeçalhos de segurança e política de cache
-montar.pl         gera o index.html a partir do arquivo de origem
-previa.pl         servidor local que aplica os mesmos cabeçalhos do netlify.toml
+fonte/acessa.html   o arquivo que se edita: conteúdo, motor de decisão e interface
+index.html          gerado a partir da fonte, com a tipografia local; não edite à mão
+fontes/             Poppins hospedada aqui, para não entregar o IP de quem visita
+                    a um servidor de terceiro
+docs/               arquitetura, protocolo de teste de acessibilidade e roteiro do piloto
+netlify.toml        publicação, cabeçalhos de segurança e política de cache
+montar.pl           gera o index.html a partir da fonte
+previa.pl           servidor local com os mesmos cabeçalhos do netlify.toml
+CHANGELOG.md        o que mudou em cada versão
 ```
 
 ## Rodar localmente
@@ -30,9 +33,16 @@ Abre em `http://127.0.0.1:8790`. Usa a mesma Content-Security-Policy da
 produção, então um recurso externo que passar despercebido quebra aqui antes de
 quebrar no ar.
 
-## Publicar
+## Editar e publicar
 
-O Netlify observa a branch principal. Todo push publica.
+Edite `fonte/acessa.html`, gere o site e confira:
+
+```
+perl montar.pl
+perl previa.pl 8790
+```
+
+Depois publique. O Netlify observa a branch principal: todo push publica.
 
 ```
 git add -A
@@ -41,6 +51,12 @@ git push
 ```
 
 Sem build: o Netlify serve a raiz como está.
+
+## Piloto com agentes comunitários
+
+O roteiro para começar os testes está em [docs/piloto-agentes.md](docs/piloto-agentes.md).
+Os links por unidade ficam em `#/links-piloto`, e os avisos enviados pelo site
+chegam em *Netlify → Forms → aviso*.
 
 ## Verificações antes de publicar
 

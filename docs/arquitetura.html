@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arquitetura do ACESSA+</title>
+<meta name="description" content="Análise arquitetural do ACESSA+: o que o código já suporta, onde a promessa de privacidade colide com o cadastro de acompanhantes, e a sequência de evolução do piloto.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+/* ============================================================
+   Arquitetura do ACESSA+
+   Registro técnico. Referência visual: formulário institucional
+   brasileiro — papel verde-acinzentado, carimbo de situação,
+   campo de protocolo. Sans documental no título, serifada no
+   corpo (inversão deliberada), monoespaçada nos identificadores.
+   ============================================================ */
+:root {
+  --ground:#EEF1EC; --surface:#FFFFFF; --sunk:#E2E7E1;
+  --ink:#17201C; --ink-2:#55605A; --line:#CBD4CD; --line-firm:#9EACA3;
+  --accent:#0A5E48; --accent-soft:#DDEBE4;
+  --flag:#7A2E6B; --flag-soft:#F1E3EE;
+  --warn:#8A5A00; --warn-soft:#F7EDD8;
+  --display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --measure:34rem;
+  --wide:56rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:#121714; --surface:#1A211D; --sunk:#0D1210;
+    --ink:#E4EAE4; --ink-2:#9BA79F; --line:#2C3630; --line-firm:#4A574F;
+    --accent:#47B994; --accent-soft:#132A22;
+    --flag:#D69AC8; --flag-soft:#2A1826;
+    --warn:#DDB05A; --warn-soft:#2A2312;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:#121714; --surface:#1A211D; --sunk:#0D1210;
+  --ink:#E4EAE4; --ink-2:#9BA79F; --line:#2C3630; --line-firm:#4A574F;
+  --accent:#47B994; --accent-soft:#132A22;
+  --flag:#D69AC8; --flag-soft:#2A1826;
+  --warn:#DDB05A; --warn-soft:#2A2312;
+}
+
+* { box-sizing:border-box; }
+body { margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--body); font-size:17px; line-height:1.62; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.001ms!important; animation-duration:.001ms!important; } }
+
+.wrap { max-width:var(--measure); margin:0 auto; padding:0 1.5rem; }
+.wrap--wide { max-width:var(--wide); }
+
+h1,h2,h3,h4 { font-family:var(--display); font-weight:700; line-height:1.15; margin:0; text-wrap:balance; }
+h1 { font-size:clamp(2rem,1.4rem+2.6vw,3.1rem); letter-spacing:-.022em; }
+h2 { font-size:clamp(1.4rem,1.2rem+.9vw,1.85rem); letter-spacing:-.012em; }
+h3 { font-size:1.12rem; font-weight:600; letter-spacing:-.005em; }
+h4 { font-size:.95rem; font-weight:600; }
+p { margin:0; }
+a { color:var(--accent); text-underline-offset:.16em; }
+strong { font-weight:600; }
+code, .mono { font-family:var(--mono); font-size:.86em; }
+code { background:var(--sunk); padding:.1em .34em; border-radius:2px; }
+
+.eyebrow { font-family:var(--display); font-size:.72rem; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2); }
+
+/* ---- cabeçalho, com faixa de protocolo ---- */
+.head { background:var(--surface); border-bottom:1px solid var(--line); }
+.head .wrap { padding-block:3.4rem 2.2rem; display:flex; flex-direction:column; gap:1rem; }
+.head h1 { max-width:14ch; }
+.head .sub { font-size:1.14rem; color:var(--ink-2); max-width:42ch; }
+.rule-spectrum { height:4px; background:linear-gradient(90deg,#FDCE00 0%,#BACC0E 22%,#259E38 44%,#32A2A4 62%,#0A5E48 80%,#5A3088 100%); }
+
+.protocolo { background:var(--sunk); border-bottom:1px solid var(--line); }
+.protocolo .wrap { padding-block:.85rem; display:grid; gap:.65rem 2rem;
+  grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); }
+.protocolo dt { font-family:var(--display); font-size:.66rem; font-weight:600;
+  letter-spacing:.13em; text-transform:uppercase; color:var(--ink-2); margin-bottom:.15rem; }
+.protocolo dd { margin:0; font-family:var(--mono); font-size:.82rem; }
+
+main { padding-bottom:5rem; }
+section { padding-top:3.2rem; }
+.lede { font-size:1.1rem; }
+.stack { display:flex; flex-direction:column; gap:1.05rem; }
+.stack--tight { gap:.65rem; }
+h2 + .stack, h3 + .stack { margin-top:.9rem; }
+
+/* ---- carimbo de situação, espelhando as três faixas do próprio produto ---- */
+.req { border-top:1px solid var(--line-firm); padding-top:1.4rem; }
+.req__head { display:flex; flex-wrap:wrap; align-items:baseline; gap:.6rem 1rem; margin-bottom:.85rem; }
+.req__n { font-family:var(--mono); font-size:.8rem; color:var(--ink-2); }
+.carimbo { font-family:var(--display); font-size:.68rem; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; padding:.22rem .5rem;
+  border:1.5px solid currentColor; white-space:nowrap; }
+.carimbo--ok { color:var(--accent); }
+.carimbo--refat { color:var(--warn); }
+.carimbo--conflito { color:var(--flag); }
+
+/* ---- destaque: o achado que muda a arquitetura ---- */
+.alerta { background:var(--flag-soft); border-left:4px solid var(--flag); padding:1.15rem 1.3rem; }
+.alerta h3 { color:var(--flag); margin-bottom:.5rem; }
+.nota { background:var(--accent-soft); border-left:4px solid var(--accent); padding:1.15rem 1.3rem; }
+.nota h3 { color:var(--accent); margin-bottom:.5rem; }
+
+/* ---- listas ---- */
+ul.pontos { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.7rem; }
+ul.pontos > li { padding-left:1.15rem; position:relative; }
+ul.pontos > li::before { content:""; position:absolute; left:0; top:.62em;
+  width:.42rem; height:.42rem; background:var(--line-firm); }
+
+/* ---- tabela ---- */
+.tabela-wrap { overflow-x:auto; border:1px solid var(--line); background:var(--surface); }
+table { border-collapse:collapse; width:100%; min-width:34rem; font-size:.92rem; }
+caption { text-align:left; font-family:var(--display); font-size:.72rem; font-weight:600;
+  letter-spacing:.13em; text-transform:uppercase; color:var(--ink-2);
+  padding:.8rem 1rem .5rem; }
+th, td { text-align:left; padding:.62rem 1rem; border-top:1px solid var(--line); vertical-align:top; }
+th { font-family:var(--display); font-size:.76rem; font-weight:600;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); }
+td.mono { font-family:var(--mono); font-size:.82rem; white-space:nowrap; }
+tbody tr:nth-child(odd) td { background:color-mix(in srgb, var(--sunk) 45%, transparent); }
+
+/* ---- figuras ---- */
+figure { margin:0; }
+.fig-scroll { overflow-x:auto; background:var(--surface); border:1px solid var(--line); padding:1.4rem 1.2rem; }
+.fig-scroll svg { display:block; max-width:100%; height:auto; min-width:30rem; color:var(--ink); }
+figcaption { font-size:.9rem; color:var(--ink-2); margin-top:.7rem; max-width:46ch; }
+.svg-label { font-family:"Archivo", Arial, sans-serif; font-size:12px; font-weight:600; fill:currentColor; }
+.svg-sub { font-family:"Archivo", Arial, sans-serif; font-size:10.5px; fill:var(--ink-2); }
+.svg-edge { font-family:"IBM Plex Mono", monospace; font-size:9.5px; fill:var(--ink-2); }
+.svg-zone { font-family:"Archivo", Arial, sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:.09em; fill:var(--ink-2); }
+
+/* ---- sequência numerada: é sequência de verdade ---- */
+ol.seq { list-style:none; counter-reset:s; margin:0; padding:0;
+  display:flex; flex-direction:column; gap:1.1rem; }
+ol.seq > li { counter-increment:s; display:grid; grid-template-columns:2.1rem 1fr; gap:.9rem; align-items:start; }
+ol.seq > li::before { content:counter(s); font-family:var(--display); font-weight:700;
+  font-size:.95rem; color:var(--surface); background:var(--accent);
+  width:2.1rem; height:2.1rem; display:grid; place-items:center; }
+ol.seq h3 { margin-bottom:.2rem; }
+ol.seq p { font-size:.96rem; color:var(--ink-2); }
+
+footer { border-top:1px solid var(--line-firm); margin-top:3.5rem; padding-top:1.6rem; }
+footer p { font-size:.88rem; color:var(--ink-2); }
+
+a:focus-visible, [tabindex]:focus-visible { outline:2.5px solid var(--accent); outline-offset:3px; }
+</style>
+
+<header class="head">
+  <div class="wrap">
+    <p class="eyebrow">Registro técnico · artefato de tese</p>
+    <h1>Arquitetura do ACESSA+</h1>
+    <p class="sub">O que o código já sustenta, onde a promessa de privacidade colide com o cadastro de acompanhantes, e em que ordem evoluir o piloto.</p>
+  </div>
+</header>
+<div class="rule-spectrum" aria-hidden="true"></div>
+
+<div class="protocolo">
+  <dl class="wrap wrap--wide">
+    <div><dt>Data</dt><dd>06/09/2026</dd></div>
+    <div><dt>Piloto</dt><dd>9 benefícios · 187 KB</dd></div>
+    <div><dt>Esferas</dt><dd>federal · estadual PR · municipal</dd></div>
+    <div><dt>Autoteste</dt><dd>25/25 verificações</dd></div>
+  </dl>
+</div>
+
+<main>
+
+  <section class="wrap">
+    <h2>Veredito</h2>
+    <div class="stack">
+      <p class="lede">A camada de conteúdo e o motor de regras aguentam a expansão com refatoração incremental — hoje isso deixou de ser hipótese: seis benefícios entraram sem que nenhuma tela fosse tocada, e o motor passou a ser declarativo.</p>
+      <p>O que <em>não</em> cabe é cadastro de pessoas. O obstáculo não é técnico. É que o artefato inteiro repousa sobre a frase <strong>“nada do que você responde é salvo”</strong>, repetida em cinco lugares, e um painel de famílias atendidas a transforma em mentira no primeiro registro gravado.</p>
+      <p>Esse é o único item desta análise que exige decisão antes de código.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>O que já está de pé</h2>
+    <div class="stack">
+      <p>Três mudanças entraram hoje e mudam o que é possível construir em cima.</p>
+      <ul class="pontos">
+        <li><strong>Motor declarativo.</strong> Cada benefício declara <code>regras: [...]</code> e um avaliador único percorre a lista. O motor não conhece benefício nenhum. Benefício novo virou dado, não código.</li>
+        <li><strong>Parâmetros com vigência.</strong> <code>PARAMS</code> guarda valor, início, fim e fonte. A consulta é sempre por data, então a página consegue dizer <em>qual era o valor naquele dia</em> — requisito de um artefato que precisa ser reproduzível.</li>
+        <li><strong>Origem da demanda.</strong> A sessão continua anônima e passou a carregar de onde a pessoa veio (<code>?org=cras-centro</code>). Rastreabilidade agregada sem nenhum dado pessoal.</li>
+      </ul>
+      <div class="nota">
+        <h3>Autoteste do motor</h3>
+        <p>O motor decide o que a família vai tentar primeiro, então virou objeto de teste, não de conferência no olho. Sete perfis fixos, vinte e cinco verificações, executáveis no navegador em <code>#/autoteste</code>. É o que permite mexer nas regras sem quebrar o que já funcionava.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap wrap--wide">
+    <h2>O motor, antes e depois</h2>
+    <div class="stack">
+      <p>A diferença que importa é uma aresta: no desenho anterior, todo benefício novo obrigava a editar a função de decisão.</p>
+      <figure>
+        <div class="fig-scroll">
+          <svg viewBox="0 0 720 300" role="img" aria-label="Antes, cada benefício exigia editar a função de elegibilidade, que continha uma cadeia de condicionais por tipo de regra. Depois, cada benefício declara suas regras como dado e um avaliador único percorre a lista, sem alteração no motor.">
+            <defs>
+              <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+              </marker>
+              <marker id="ar-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#7A2E6B"/>
+              </marker>
+            </defs>
+
+            <text x="0" y="14" class="svg-zone">ANTES</text>
+            <line x1="0" y1="24" x2="330" y2="24" stroke="currentColor" stroke-width="1" opacity=".28"/>
+            <rect x="0" y="44" width="104" height="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="52" y="63" class="svg-label" text-anchor="middle">Benefício A</text>
+            <rect x="0" y="86" width="104" height="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="52" y="105" class="svg-label" text-anchor="middle">Benefício B</text>
+            <rect x="0" y="128" width="104" height="30" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 3"/>
+            <text x="52" y="147" class="svg-label" text-anchor="middle">Benefício novo</text>
+
+            <path d="M104 59 L186 100" stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#ar)"/>
+            <path d="M104 101 L186 104" stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#ar)"/>
+            <path d="M104 143 L186 112" stroke="#7A2E6B" stroke-width="1.8" fill="none" marker-end="url(#ar-a)"/>
+            <text x="118" y="168" class="svg-edge" fill="#7A2E6B">editar o motor</text>
+
+            <rect x="188" y="44" width="140" height="140" fill="none" stroke="#7A2E6B" stroke-width="1.8"/>
+            <text x="258" y="66" class="svg-label" text-anchor="middle">elegibilidade()</text>
+            <line x1="204" y1="80" x2="312" y2="80" stroke="currentColor" stroke-width="1" opacity=".3"/>
+            <text x="204" y="98" class="svg-sub">if território…</text>
+            <text x="204" y="115" class="svg-sub">else if deficiência…</text>
+            <text x="204" y="132" class="svg-sub">else if idade…</text>
+            <text x="204" y="149" class="svg-sub">else if depende…</text>
+            <text x="204" y="166" class="svg-sub">else if renda…</text>
+            <text x="188" y="204" class="svg-edge">7 ramos acoplados</text>
+
+            <line x1="368" y1="20" x2="368" y2="270" stroke="currentColor" stroke-width="1" opacity=".22" stroke-dasharray="5 5"/>
+
+            <text x="400" y="14" class="svg-zone">DEPOIS</text>
+            <line x1="400" y1="24" x2="720" y2="24" stroke="currentColor" stroke-width="1" opacity=".28"/>
+            <rect x="400" y="44" width="128" height="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="464" y="63" class="svg-label" text-anchor="middle">A · regras[]</text>
+            <rect x="400" y="86" width="128" height="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="464" y="105" class="svg-label" text-anchor="middle">B · regras[]</text>
+            <rect x="400" y="128" width="128" height="30" fill="none" stroke="#0A5E48" stroke-width="1.8" stroke-dasharray="4 3"/>
+            <text x="464" y="147" class="svg-label" text-anchor="middle" fill="#0A5E48">novo · regras[]</text>
+
+            <path d="M528 59 L600 100" stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#ar)"/>
+            <path d="M528 101 L600 104" stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#ar)"/>
+            <path d="M528 143 L600 112" stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#ar)"/>
+            <text x="524" y="180" class="svg-edge">só dado</text>
+
+            <rect x="602" y="60" width="112" height="88" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="658" y="82" class="svg-label" text-anchor="middle">avaliador</text>
+            <text x="658" y="99" class="svg-sub" text-anchor="middle">único</text>
+            <line x1="616" y1="110" x2="700" y2="110" stroke="currentColor" stroke-width="1" opacity=".3"/>
+            <text x="658" y="128" class="svg-sub" text-anchor="middle">menor nível</text>
+            <text x="658" y="142" class="svg-sub" text-anchor="middle">vence</text>
+            <text x="602" y="170" class="svg-edge">não muda</text>
+
+            <text x="400" y="238" class="svg-edge">AVALIADORES: municipio · uf · deficiencia · idade</text>
+            <text x="400" y="254" class="svg-edge">dependeDe · trabalhoAtual · rendaPerCapita · cadastro</text>
+            <text x="0" y="238" class="svg-edge">Cada regra nova era um ramo novo</text>
+            <text x="0" y="254" class="svg-edge">dentro da mesma função.</text>
+          </svg>
+        </div>
+        <figcaption>A aresta em destaque desaparece: no desenho novo, acrescentar benefício não toca no motor. Nove benefícios exercitam oito tipos de avaliador.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap wrap--wide">
+    <h2>O grafo do melhor caminho</h2>
+    <div class="stack">
+      <p>“Apontar o melhor caminho” só é calculável se os benefícios deixarem de ser avaliados isoladamente. O que os conecta são os <strong>pré-requisitos compartilhados</strong>: um mesmo passo destrava vários direitos.</p>
+      <figure>
+        <div class="fig-scroll">
+          <svg viewBox="0 0 720 420" role="img" aria-label="Grafo de pré-requisitos. O CadÚnico destrava BPC, Tarifa Social e Bolsa Família; o laudo destrava BPC, Passe Livre e o transporte municipal; a conta gov.br destrava Passe Livre e Auxílio-Inclusão. O BPC é pré-requisito do Auxílio-Inclusão, única dependência entre benefícios.">
+            <defs>
+              <marker id="g-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+              </marker>
+              <marker id="g-ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#0A5E48"/>
+              </marker>
+              <marker id="g-af" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#7A2E6B"/>
+              </marker>
+            </defs>
+
+            <text x="0" y="14" class="svg-zone">PASSO COMPARTILHADO</text>
+            <text x="420" y="14" class="svg-zone">DIREITO</text>
+
+            <rect x="0" y="34" width="150" height="34" fill="none" stroke="#0A5E48" stroke-width="2.2"/>
+            <text x="75" y="50" class="svg-label" text-anchor="middle" fill="#0A5E48">CadÚnico</text>
+            <text x="75" y="63" class="svg-sub" text-anchor="middle">destrava 3</text>
+
+            <rect x="0" y="94" width="150" height="34" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="75" y="110" class="svg-label" text-anchor="middle">Laudo do SUS</text>
+            <text x="75" y="123" class="svg-sub" text-anchor="middle">destrava 3</text>
+
+            <rect x="0" y="154" width="150" height="34" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="75" y="170" class="svg-label" text-anchor="middle">Conta gov.br</text>
+            <text x="75" y="183" class="svg-sub" text-anchor="middle">destrava 2</text>
+
+            <rect x="0" y="214" width="150" height="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="75" y="233" class="svg-label" text-anchor="middle">Perícia Detran</text>
+            <rect x="0" y="258" width="150" height="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="75" y="277" class="svg-label" text-anchor="middle">Matrícula</text>
+            <rect x="0" y="302" width="150" height="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="75" y="321" class="svg-label" text-anchor="middle">Protocolo clínico</text>
+
+            <rect x="420" y="30" width="200" height="28" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="430" y="49" class="svg-label">BPC</text>
+            <rect x="420" y="68" width="200" height="28" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="430" y="87" class="svg-label">Tarifa Social</text>
+            <rect x="420" y="106" width="200" height="28" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="430" y="125" class="svg-label">Bolsa Família</text>
+            <rect x="420" y="144" width="200" height="28" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="430" y="163" class="svg-label">Passe Livre interestadual</text>
+            <rect x="420" y="182" width="200" height="28" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="430" y="201" class="svg-label">Transporte de Londrina</text>
+            <rect x="420" y="220" width="200" height="28" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="430" y="239" class="svg-label">Isenção de IPVA</text>
+            <rect x="420" y="258" width="200" height="28" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="430" y="277" class="svg-label">AEE na escola</text>
+            <rect x="420" y="296" width="200" height="28" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="430" y="315" class="svg-label">Medicamento CEAF</text>
+            <rect x="420" y="352" width="200" height="28" fill="none" stroke="#7A2E6B" stroke-width="1.8"/>
+            <text x="430" y="371" class="svg-label" fill="#7A2E6B">Auxílio-Inclusão</text>
+
+            <path d="M150 47 L418 44" stroke="#0A5E48" stroke-width="2" fill="none" marker-end="url(#g-ac)"/>
+            <path d="M150 52 L418 82" stroke="#0A5E48" stroke-width="2" fill="none" marker-end="url(#g-ac)"/>
+            <path d="M150 58 L418 120" stroke="#0A5E48" stroke-width="2" fill="none" marker-end="url(#g-ac)"/>
+            <path d="M150 105 L418 50" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55" marker-end="url(#g-ar)"/>
+            <path d="M150 111 L418 158" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55" marker-end="url(#g-ar)"/>
+            <path d="M150 117 L418 196" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55" marker-end="url(#g-ar)"/>
+            <path d="M150 168 L418 164" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55" marker-end="url(#g-ar)"/>
+            <path d="M150 174 L418 362" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55" marker-end="url(#g-ar)"/>
+            <path d="M150 229 L418 234" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55" marker-end="url(#g-ar)"/>
+            <path d="M150 273 L418 272" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55" marker-end="url(#g-ar)"/>
+            <path d="M150 317 L418 310" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".55" marker-end="url(#g-ar)"/>
+
+            <path d="M520 58 C 560 58, 640 200, 620 350" stroke="#7A2E6B" stroke-width="1.8" fill="none" marker-end="url(#g-af)"/>
+            <text x="628" y="210" class="svg-edge" fill="#7A2E6B">exige o BPC</text>
+            <text x="628" y="224" class="svg-edge" fill="#7A2E6B">concedido antes</text>
+
+            <text x="170" y="404" class="svg-edge">Verde: o passo de maior alcance. Roxo: única dependência entre direitos.</text>
+          </svg>
+        </div>
+        <figcaption>Com o perfil de teste em Londrina, o motor responde “comece pelo CadÚnico” porque três direitos dependem dele. O custo de cada passo ainda é atribuído à mão — é o que falta para o cálculo ser defensável.</figcaption>
+      </figure>
+      <div class="nota">
+        <h3>O custo de cada caminho deixou de ser palpite</h3>
+        <p>O <code>esforco</code> atribuído à mão foi substituído por um índice calculado do próprio mapa do benefício, seguindo a decomposição de <strong>custo administrativo</strong> de Herd e Moynihan: custo de aprendizado, de conformidade e psicológico. Etapas, idas presenciais, exigência de conta digital, perícia, laudo, renovação e dependência de outro benefício entram na conta; a comparação é relativa ao catálogo.</p>
+        <p>A etiqueta também mudou de linguagem: em vez de uma nota abstrata, diz o que custa — <em>“2 idas presenciais · perícia ou avaliação · laudo médico · conta gov.br · resultado em meses”</em>.</p>
+        <p>Falta um insumo, e ele é de campo: <strong>taxa de indeferimento e tempo real até o resultado</strong>. Sem isso o índice mede o esforço declarado pelo procedimento, não o sofrido pela pessoa. É o modo acompanhado que produziria esse dado.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Veredito por requisito</h2>
+  </section>
+
+  <section class="wrap">
+    <div class="req">
+      <div class="req__head">
+        <span class="req__n">01</span>
+        <h3>Todos os benefícios, independente do local</h3>
+        <span class="carimbo carimbo--refat">cabe com refatoração</span>
+      </div>
+      <div class="stack">
+        <p>Provado hoje na prática. O que ainda quebra na escala:</p>
+        <ul class="pontos">
+          <li><code>municipio</code> é um radio de quatro opções, e foi preciso chumbar uma tabela <code>UF_DO_MUNICIPIO</code>. São 5.570 municípios: precisa de código IBGE e autocomplete.</li>
+          <li><strong>Peso do pacote.</strong> Seis benefícios custaram 43 KB, ou ~7 KB cada. Duzentos dariam ~1,5 MB num arquivo só — inviável para celular barato em rede ruim, que é o público. O conteúdo precisa sair do pacote e ser carregado por território.</li>
+          <li><strong>Falta vigência do benefício.</strong> A Tarifa Social provou que eles mudam de natureza. Sumir é pior que dizer “acabou em tal data”.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="req">
+      <div class="req__head">
+        <span class="req__n">02</span>
+        <h3>Agentes comunitários com painel de famílias</h3>
+        <span class="carimbo carimbo--conflito">conflita com a fundação</span>
+      </div>
+      <div class="stack">
+        <p>Um painel de famílias atendidas exige registro identificado e persistente de deficiência, renda e composição familiar. Isso é dado pessoal sensível na LGPD (art. 5º, II) e, sendo pesquisa de doutorado, entra também nas Resoluções CNS 466/2012 e 510/2016 — consentimento e aprovação em CEP/CONEP.</p>
+        <p>Não se resolve com uma opção no mesmo código. Exige fronteira dura entre dois modos, e a inversão desenhada abaixo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap wrap--wide">
+    <div class="stack">
+      <figure>
+        <div class="fig-scroll">
+          <svg viewBox="0 0 720 330" role="img" aria-label="A sessão anônima não grava nada e entrega à família um código de acompanhamento. É a família que decide passar o código ao agente, e é esse código que cria o vínculo. O caminho inverso, em que o agente cadastra a família, aparece barrado.">
+            <defs>
+              <marker id="b-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+              </marker>
+              <marker id="b-ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#0A5E48"/>
+              </marker>
+            </defs>
+
+            <rect x="0" y="34" width="316" height="240" fill="none" stroke="currentColor" stroke-width="1" opacity=".3" stroke-dasharray="6 4"/>
+            <text x="0" y="24" class="svg-zone">SEM DADO PESSOAL</text>
+            <rect x="404" y="34" width="316" height="240" fill="none" stroke="#7A2E6B" stroke-width="1" opacity=".55" stroke-dasharray="6 4"/>
+            <text x="404" y="24" class="svg-zone" fill="#7A2E6B">EXIGE CONSENTIMENTO E CEP</text>
+
+            <rect x="24" y="58" width="140" height="34" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="94" y="80" class="svg-label" text-anchor="middle">Entidade</text>
+            <rect x="24" y="128" width="140" height="46" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="94" y="147" class="svg-label" text-anchor="middle">Sessão anônima</text>
+            <text x="94" y="163" class="svg-sub" text-anchor="middle">nada é gravado</text>
+            <rect x="24" y="212" width="140" height="34" fill="none" stroke="#0A5E48" stroke-width="2"/>
+            <text x="94" y="234" class="svg-label" text-anchor="middle" fill="#0A5E48">Código</text>
+
+            <path d="M94 128 L94 96" stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#b-ar)"/>
+            <text x="102" y="116" class="svg-edge">origem</text>
+            <path d="M94 174 L94 208" stroke="#0A5E48" stroke-width="1.8" fill="none" marker-end="url(#b-ac)"/>
+            <text x="102" y="196" class="svg-edge" fill="#0A5E48">gera</text>
+
+            <rect x="196" y="128" width="104" height="46" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="248" y="147" class="svg-label" text-anchor="middle">Família</text>
+            <text x="248" y="163" class="svg-sub" text-anchor="middle">pseudônimo</text>
+
+            <path d="M164 229 C 220 229, 240 200, 246 178" stroke="#0A5E48" stroke-width="1.8" fill="none" marker-end="url(#b-ac)"/>
+            <text x="170" y="256" class="svg-edge" fill="#0A5E48">recebe e guarda</text>
+
+            <path d="M300 145 L438 145" stroke="#0A5E48" stroke-width="2.2" fill="none" marker-end="url(#b-ac)"/>
+            <text x="312" y="136" class="svg-edge" fill="#0A5E48">entrega o código</text>
+            <text x="312" y="164" class="svg-edge" fill="#0A5E48">quem consente é quem controla</text>
+
+            <path d="M438 196 L300 196" stroke="currentColor" stroke-width="1.6" fill="none" opacity=".45" stroke-dasharray="5 4"/>
+            <line x1="356" y1="184" x2="382" y2="208" stroke="#7A2E6B" stroke-width="2.4"/>
+            <line x1="382" y1="184" x2="356" y2="208" stroke="#7A2E6B" stroke-width="2.4"/>
+            <text x="312" y="224" class="svg-edge" fill="#7A2E6B">agente cadastra família</text>
+
+            <rect x="440" y="58" width="130" height="34" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="505" y="80" class="svg-label" text-anchor="middle">Ator</text>
+            <text x="578" y="72" class="svg-sub">ACS · voluntário</text>
+            <text x="578" y="86" class="svg-sub">· familiar</text>
+
+            <rect x="440" y="128" width="130" height="46" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="505" y="147" class="svg-label" text-anchor="middle">Vínculo</text>
+            <text x="505" y="163" class="svg-sub" text-anchor="middle">escopo · prazo</text>
+            <text x="588" y="152" class="svg-sub">revogável</text>
+
+            <rect x="440" y="196" width="130" height="34" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="505" y="218" class="svg-label" text-anchor="middle">Jornada</text>
+            <rect x="440" y="246" width="130" height="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <text x="505" y="266" class="svg-label" text-anchor="middle">Evento</text>
+
+            <path d="M505 92 L505 124" stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#b-ar)"/>
+            <path d="M505 174 L505 192" stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#b-ar)"/>
+            <text x="514" y="188" class="svg-edge">abre</text>
+            <path d="M505 230 L505 242" stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#b-ar)"/>
+            <text x="514" y="242" class="svg-edge">trilha</text>
+
+            <text x="0" y="300" class="svg-edge">A seta que atravessa a fronteira parte da família. É isso que torna o consentimento verificável,</text>
+            <text x="0" y="316" class="svg-edge">e não uma caixa marcada por quem tem mais poder na relação.</text>
+          </svg>
+        </div>
+        <figcaption>Modelo de dados e a fronteira de consentimento. O agente nunca cria família: ele recebe um código que a família decidiu entregar.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="req">
+      <div class="req__head">
+        <span class="req__n">03</span>
+        <h3>Voluntários e familiares acompanhando</h3>
+        <span class="carimbo carimbo--refat">cabe, com modelo de papéis</span>
+      </div>
+      <div class="stack">
+        <p>A semente existe e está inerte: <code>FIELDS.para</code> já distingue <em>mim</em>, <em>familiar</em> e <em>agente comunitário</em>, mas hoje isso só troca texto.</p>
+        <p>A diferença não é cosmética. <strong>ACS tem vínculo institucional e dever funcional; voluntário não tem nenhum; familiar pode ser o próprio requerente ou curador.</strong> Legitimidade jurídica, permissões e trilha diferentes. Tratar os três como “acompanhante” seria erro de projeto com consequência legal.</p>
+      </div>
+    </div>
+
+    <div class="req">
+      <div class="req__head">
+        <span class="req__n">04</span>
+        <h3>Entidades e rastreabilidade da demanda</h3>
+        <span class="carimbo carimbo--ok">implementado hoje</span>
+      </div>
+      <div class="stack">
+        <p>Era o item mais barato e o mais valioso para a tese, e por isso foi feito primeiro. A sessão anônima carrega a origem e o site mostra por onde a pessoa chegou. Ids desconhecidos são ignorados, então nada vindo da URL alcança o HTML.</p>
+        <p>Isso já mede <em>quantas triagens saíram de cada entidade, de qual benefício, com que taxa de conclusão</em> — sem depender de resolver a questão ética do requisito 02. A agregação em si precisa de servidor; o mecanismo de captura está pronto.</p>
+      </div>
+    </div>
+
+    <div class="req">
+      <div class="req__head">
+        <span class="req__n">05</span>
+        <h3>O guia entregue à família</h3>
+        <span class="carimbo carimbo--refat">existe, com a forma errada</span>
+      </div>
+      <div class="stack">
+        <p>Hoje o guia é gerado <strong>por benefício</strong>. Com nove benefícios, a família sai com nove mensagens soltas, e várias mandam ir ao CRAS fazer o CadÚnico. Na prática, manda a pessoa três vezes ao mesmo balcão.</p>
+        <p>Precisa virar um <strong>plano único, ordenado por pré-requisito</strong> — o bloco “Por onde começar” é a primeira versão dessa ideia, mas ela ainda não desce para o guia impresso nem para a mensagem enviada.</p>
+      </div>
+    </div>
+
+    <div class="req">
+      <div class="req__head">
+        <span class="req__n">06</span>
+        <h3>Dificuldades comuns como guia</h3>
+        <span class="carimbo carimbo--refat">falta tipificar</span>
+      </div>
+      <div class="stack">
+        <p>O campo <code>erro</code> por etapa é matéria-prima boa, mas é prosa. Tipado — <code>{tipo, gravidade, etapa, comoEvitar, comoReverter}</code>, com tipos fechados como <em>documento faltante</em>, <em>recusa indevida</em>, <em>dado divergente</em>, <em>prazo perdido</em> e <em>cobrança indevida</em> — ele passa a ser contável.</p>
+        <div class="nota">
+          <h3>O ciclo que sustenta a tese</h3>
+          <p>Tipado e medido no modo acompanhado, o “o que costuma dar errado” deixa de ser intuição de curadoria e vira evidência. O artefato passa a produzir o dado que melhora o próprio artefato — e é esse ciclo, não a lista de benefícios, que é a contribuição defensável.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap wrap--wide">
+    <h2>Bloqueios transversais</h2>
+    <div class="stack">
+      <div class="tabela-wrap">
+        <table>
+          <caption>Ordenado por urgência</caption>
+          <thead>
+            <tr><th scope="col">Bloqueio</th><th scope="col">Situação</th><th scope="col">Por quê</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Escape na renderização</td>
+              <td class="mono">resolvido</td>
+              <td>Tudo era concatenação em <code>innerHTML</code> e o escape só tratava aspas. Com origem vindo da URL, virou porta de injeção. Agora escapa <code>&amp; &lt; &gt; " '</code> e valida id contra lista.</td>
+            </tr>
+            <tr>
+              <td>Estado global mutável</td>
+              <td class="mono">aberto</td>
+              <td><code>resp</code>, <code>formErrors</code> e <code>fromRevisar</code> são globais. Um painel com várias famílias não sobrevive a isso. O motor já foi desacoplado; as telas não.</td>
+            </tr>
+            <tr>
+              <td>Operação offline</td>
+              <td class="mono">aberto</td>
+              <td>Agente comunitário trabalha em campo, muitas vezes sem sinal. Requisito real, arquitetura zero.</td>
+            </tr>
+            <tr>
+              <td>Arquivo único, sem build</td>
+              <td class="mono">aberto</td>
+              <td>187 KB com núcleo, conteúdo e interface juntos. Precisa separar para o conteúdo poder ser carregado por território.</td>
+            </tr>
+            <tr>
+              <td>Testes</td>
+              <td class="mono">parcial</td>
+              <td>O motor de decisão passou a ter 25 verificações executáveis. O resto do sistema segue sem teste.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Sequência recomendada</h2>
+    <div class="stack">
+      <p>O ético antes do técnico, e o barato antes do caro. Os dois primeiros passos já foram dados hoje.</p>
+      <ol class="seq">
+        <li><div><h3>Regras declarativas e parâmetros datados</h3><p>Feito. Destrava “qualquer benefício, qualquer lugar”.</p></div></li>
+        <li><div><h3>Escapar a renderização</h3><p>Feito. Pré-requisito de qualquer cadastro, não melhoria posterior.</p></div></li>
+        <li><div><h3>Entidade e origem da demanda</h3><p>Feito. Rastreabilidade sem dado pessoal, já gerando dado de campo.</p></div></li>
+        <li><div><h3>Código de acompanhamento controlado pela família</h3><p>Resolve o consentimento <em>antes</em> de existir qualquer cadastro. Depende de decisão sua e de submissão ao CEP.</p></div></li>
+        <li><div><h3>Atores, vínculos, jornadas e painéis</h3><p>Só depois dos quatro anteriores. É aqui que entra persistência, e portanto base legal e trilha de auditoria.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>O que falta decidir</h2>
+    <div class="stack">
+      <ul class="pontos">
+        <li><strong>Submissão ao CEP/CONEP</strong> antes de qualquer persistência de dado identificado. Isso é caminho crítico, não formalidade.</li>
+        <li><strong>Quatro erros materiais de conteúdo</strong> seguem marcados e não corrigidos no piloto, aguardando sua conferência na redação vigente — com destaque para a Tarifa Social, que mudou de natureza com a Lei 15.235/2025.</li>
+        <li><strong>Como medir esforço.</strong> Sem número de deslocamentos, prazo típico e taxa de indeferimento, o “melhor caminho” continua ordenando por estimativa, não por evidência.</li>
+      </ul>
+      <div class="alerta">
+        <h3>Um achado do próprio piloto</h3>
+        <p>O Auxílio-Inclusão exige estar trabalhando com carteira <em>agora</em>; o formulário só pergunta se a pessoa <em>já trabalhou alguma vez</em>. O motor diz isso ao usuário, em vez de fingir que sabe. É evidência de que perguntas e regras têm de evoluir juntas — e portanto de que <strong>o conjunto de perguntas também precisa ser dado, não código</strong>, pela mesma razão que as regras.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <p>Análise do artefato ACESSA+ · doutorado profissional, Universidade Positivo, com apoio do ecohub espaço maker. Estado do piloto em 06/09/2026: 9 benefícios, 3 esferas, motor declarativo com 25 verificações automatizadas.</p>
+  </footer>
+
+</main>
+
+</html>
