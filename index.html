@@ -306,6 +306,24 @@ main { display:block; }
 .caminho { background:var(--petrol-tint); border-left:6px solid var(--petrol); padding:1.15rem 1.35rem; margin:1.5rem 0; }
 .caminho h2 { font-size:1rem; text-transform:uppercase; letter-spacing:.04em; margin:0 0 .4rem; color:var(--petrol); }
 .caminho__passo { font-size:1.3rem; font-weight:700; margin:0 0 .5rem; line-height:1.25; }
+/* novidades sobre direitos */
+.pub-tipo { display:block; font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--petrol); margin-bottom:.35rem; }
+.pub-data { font-size:.85rem; color:var(--ink-soft); }
+.mudanca { display:grid; grid-template-columns:repeat(auto-fit, minmax(14rem, 1fr)); gap:1rem; margin:1.25rem 0 1.5rem; }
+.mudanca > div { background:var(--surface); border:1px solid var(--line); padding:1rem 1.15rem; }
+.mudanca > .agora { border:2px solid var(--petrol); }
+.mudanca h2 { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; margin:0 0 .4rem; color:var(--ink-soft); }
+.mudanca .agora h2 { color:var(--petrol); }
+.mudanca p, .mudanca ul { margin:0; }
+.mudanca ul { padding-left:1.1rem; }
+.mudanca li + li { margin-top:.35rem; }
+.pub-passos { margin:1rem 0 1.5rem; padding-left:1.4rem; }
+.pub-passos li { margin-bottom:.6rem; }
+.vale { list-style:none; margin:.5rem 0 0; padding:0; }
+.vale li { padding:.6rem 0; border-top:1px solid var(--line); }
+.vale li:first-child { border-top:0; }
+.vale .tag { display:inline-block; margin:.3rem 0 0; }
+.vale .porque { display:block; margin-top:.35rem; }
 .caminho p:last-child { margin-bottom:0; }
 .tag--esforco { border-style:dashed; }
 
@@ -579,6 +597,7 @@ main { display:block; }
       <li><a href="#/sobre">O que o ACESSA+ é e não é</a></li>
       <li><a href="#/sobre">Acessibilidade</a></li>
       <li><a href="#/sobre">Como as informações são verificadas</a></li>
+      <li><a href="#/novidades">Novidades sobre direitos</a></li>
       <li><a href="#/aviso">Avisar sobre um problema</a></li>
     </ul>
     <p class="note">O ACESSA+ não protocola pedido, não substitui atendimento presencial, não emite parecer sobre caso individual e não calcula quanto a pessoa vai receber. Artefato de tese de doutorado da Universidade Positivo, com apoio do ecohub espaço maker. Meta de conformidade: WCAG 2.2 AA e eMAG 3.1. Conteúdo de demonstração. Logos ecohub e UP recriados de forma aproximada neste protótipo; a versão final usa os arquivos oficiais.</p>
@@ -599,7 +618,7 @@ main { display:block; }
      data, para que a página saiba dizer "este era o valor em tal dia". */
   var PARAMS = {
     salarioMinimo: { nome: "salário mínimo", itens: [
-      { valor: 1621, inicio: "2026-01-01", fim: null, fonte: "meio salário mínimo informado como R$ 810,50 pelo Governo do Paraná em 2026; confirmar o valor cheio na norma federal" } ] },
+      { valor: 1621, inicio: "2026-01-01", fim: null, fonte: "Decreto 12.797 de 2025, a partir de 1º de janeiro de 2026" } ] },
     bfRendaPc: { nome: "limite de renda por pessoa do Bolsa Família", itens: [
       { valor: 218, inicio: "2023-07-01", fim: null, fonte: "regras do Bolsa Família, gov.br" } ] },
     bfProtecao: { nome: "teto da Regra de Proteção do Bolsa Família", itens: [
@@ -803,7 +822,7 @@ main { display:block; }
       porque: "O CadÚnico é a porta de entrada de quase todos os benefícios de baixa renda. Se não tiver, o primeiro passo costuma ser fazer no CRAS.",
       opts: [["sim", "Sim, e está atualizado"], ["antigo", "Sim, mas está antigo"], ["nao", "Não temos"], ["nao_sei", "Não sei o que é"]] },
     municipio: { k: "Município", tipo: "radio", req: true, q: "Em que município a pessoa mora?",
-      porque: "Cada cidade e cada estado tem benefícios próprios, além dos federais. Nesta versão de teste entram só três benefícios federais, então o município serve para indicar onde procurar atendimento perto de você.",
+      porque: "Cada cidade e cada estado tem benefícios próprios, além dos federais. Nesta versão de teste, os benefícios estaduais são do Paraná, e os municipais e os endereços são de Londrina.",
       opts: [["curitiba", "Curitiba"], ["londrina", "Londrina"], ["outro_pr", "Outra cidade do Paraná"], ["outro_uf", "Outro estado"]] },
     ajuda: { k: "Precisa de ajuda com", tipo: "check", req: true, q: "Com o que você precisa de ajuda agora?",
       porque: "A orientação sai na ordem que você marcar aqui.",
@@ -821,6 +840,68 @@ main { display:block; }
       intro: "Falta pouco. Estas respostas definem a ordem da sua orientação.", campos: ["municipio", "ajuda"] }
   ];
   var NPARTES = TOPICS.length;
+
+  /* ---------- novidades sobre direitos ----------
+     Não é blog. Cada novidade nasce de uma regra que o site já usa, aponta para
+     os benefícios que ela mexe e termina numa ação. Tem fonte oficial, data de
+     conferência e validade: passada a validade, sai do início e se marca em
+     revisão, para não circular desatualizada. */
+  var PUB_TIPO = { mudou: "O que mudou", duvida: "Dúvida comum", caminho: "Caminho de uma família" };
+  var PUBLICACOES = [
+    { id: "luz-ate-80-kwh", tipo: "mudou", data: "2026-09-14", v: "2026-09-14", ate: "2027-03-14",
+      titulo: "Conta de luz: quem tem Tarifa Social não paga até 80 kWh",
+      resumo: "Os primeiros 80 kWh do mês ficaram de graça. Só o que passar disso é cobrado.",
+      antes: "Desconto em faixas: 65% até 30 kWh, 40% de 31 a 100 kWh e 10% de 101 a 220 kWh.",
+      agora: ["Desconto de 100% até 80 kWh por mês.",
+              "Acima de 80 kWh, a regra federal não dá desconto. No Paraná, o Energia Solidária estende a isenção até 150 kWh."],
+      desde: "Julho de 2025, com a Medida Provisória 1.300. Ela virou a Lei 15.235 de 2025.",
+      quem: "Famílias no CadÚnico com renda de até meio salário mínimo por pessoa, hoje R$ 810,50, ou com alguém recebendo o BPC.",
+      acao: ["Ver como conferir na conta de luz", "#/direito/fed-contas-002-tarifa-social"],
+      beneficios: ["fed-contas-002-tarifa-social", "est-contas-010-energia-solidaria"],
+      fontes: [
+        ["Lei 12.212 de 2010, com a redação da Lei 15.235 de 2025", "Portal da Legislação, Planalto", "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12212.htm"],
+        ["Tarifa social de energia foi destaque do setor elétrico em 2025", "Senado Notícias", "https://www12.senado.leg.br/noticias/materias/2026/01/12/tarifa-social-de-energia-foi-destaque-do-setor-eletrico-em-2025"]
+      ] },
+    { id: "salario-minimo-2026", tipo: "mudou", data: "2026-09-14", v: "2026-09-14", ate: "2026-12-31",
+      titulo: "Salário mínimo de 2026: os novos limites de renda",
+      resumo: "Com o mínimo em R$ 1.621, mudaram os limites por pessoa do BPC, da Tarifa Social e do Passe Livre.",
+      antes: null,
+      agora: ["BPC: R$ 405,25 por pessoa, um quarto do mínimo.",
+              "Tarifa Social: R$ 810,50 por pessoa, meio mínimo.",
+              "Passe Livre Interestadual: R$ 1.621 por pessoa, um mínimo."],
+      desde: "1º de janeiro de 2026, pelo Decreto 12.797 de 2025.",
+      quem: "Quem vai pedir um desses benefícios. Para achar a renda por pessoa, some a renda da família e divida pelo número de pessoas.",
+      acao: ["Comparar a renda da sua casa", "#/parte/1"],
+      beneficios: ["fed-renda-001-bpc", "fed-contas-002-tarifa-social", "fed-transporte-003-passe-livre"],
+      fontes: [
+        ["Decreto 12.797 de 2025", "Portal da Legislação, Planalto", "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/decreto/d12797.htm"]
+      ] },
+    { id: "bpc-sem-contribuir", tipo: "duvida", data: "2026-09-14", v: "2026-09-14", ate: "2027-03-14",
+      titulo: "Preciso ter pago INSS para receber o BPC?",
+      resumo: "Não. O BPC é da assistência social, não é aposentadoria.",
+      resposta: ["Não. O BPC é da assistência social, não é aposentadoria. Não exige ter trabalhado nem contribuído.",
+                 "O que conta: deficiência de longo prazo ou 65 anos ou mais, a renda da família e o CadÚnico em dia.",
+                 "O pedido é gratuito. Ninguém precisa ser pago para agilizar."],
+      acao: ["Ver o passo a passo do BPC", "#/direito/fed-renda-001-bpc"],
+      beneficios: ["fed-renda-001-bpc"],
+      fontes: [
+        ["Lei 8.742 de 1993, a LOAS, artigos 20 e 21", "Portal da Legislação, Planalto", "https://www.planalto.gov.br/ccivil_03/leis/l8742.htm"],
+        ["Benefício assistencial à pessoa com deficiência (BPC-Loas)", "gov.br, Instituto Nacional do Seguro Social", "https://www.gov.br/inss/pt-br/direitos-e-deveres/beneficios-assistenciais/beneficio-assistencial-a-pessoa-com-deficiencia-bpc-loas"]
+      ] },
+    { id: "uma-ida-ao-cras", tipo: "caminho", data: "2026-09-14", v: "2026-09-14", ate: "2026-12-31",
+      titulo: "Uma ida ao CRAS que abre dois pedidos",
+      resumo: "Família fictícia: por onde começar quando aparecem vários direitos.",
+      exemplo: "Família fictícia, em Londrina. Quatro pessoas vivem com R$ 1.200 por mês, R$ 300 por pessoa. O filho de 9 anos tem muita dificuldade para andar. Ainda não têm CadÚnico.",
+      passos: ["No CRAS, fazer o CadÚnico. É o passo que abre o BPC e a Tarifa Social de uma vez.",
+               "No INSS, pelo 135, pedir o BPC. R$ 300 por pessoa fica abaixo do limite de R$ 405,25.",
+               "Na conta de luz, conferir a Tarifa Social depois que o CadÚnico entrar. Na maioria dos casos ela entra sozinha.",
+               "Sem depender de renda: o transporte coletivo gratuito de Londrina e o atendimento especializado na escola."],
+      nota: "Perfil fictício, criado para mostrar o caminho. As regras e os valores são os das páginas de cada benefício.",
+      acao: ["Fazer as perguntas", "#/parte/1"],
+      beneficios: ["fed-renda-001-bpc", "fed-contas-002-tarifa-social", "mun-transporte-007-passe-londrina", "fed-escola-009-aee"],
+      fontes: [] }
+  ];
+
 
   /* ---------- dados de exemplo ---------- */
   var BENEFITS = {
@@ -1720,7 +1801,7 @@ main { display:block; }
     ],
     "fed-contas-011-equipamento-vital": [
       { modo: "presencial", rotulo: "Ver o formulário e o que exigir do médico", url: "https://www.copel.com/site/copel-distribuicao/usuarios-de-equipamentos-eletromedicos/" },
-      { modo: "telefone", rotulo: "Ligar 0800 51 00 116 e conferir a agência", url: "tel:08005100116" }
+      { modo: "presencial", rotulo: "Ver as agências da Copel", url: "https://www.copel.com/site/copel-distribuicao/agencias-de-atendimento/" }
     ],
     "est-contas-010-energia-solidaria": [
       { modo: "digital", rotulo: "Conferir na Agência Virtual da Copel", url: "https://www.copel.com/site/copel-distribuicao/atendimento/" },
@@ -1804,7 +1885,7 @@ main { display:block; }
     if (c.laudo) p.push("laudo médico");
     if (c.govbr) p.push("conta gov.br");
     if (c.renovacao) p.push("renovação periódica");
-    if (c.prazo) p.push("resultado em " + c.prazo);
+    if (c.prazo) p.push((/^no /.test(c.prazo) ? "resultado " : "resultado em ") + c.prazo);
     return p.join(" · ");
   }
   function blocoCusto(b) {
@@ -2054,8 +2135,11 @@ main { display:block; }
           '<span class="no-store" style="display:inline-flex">' + svg("lock") + 'Nada do que você responde é salvo.</span></p></div>' +
         '<div class="card card--note" role="note"><p><b>Isto é orientação, não é pedido protocolado.</b> O ACESSA+ não protocola pedido, ' +
           'não substitui atendimento presencial, não emite parecer sobre o seu caso e não calcula quanto você vai receber.</p></div>' +
+        '<h2 class="upper">Novidades sobre direitos</h2>' +
+        '<ul class="task-list">' + PUBLICACOES.filter(function (p) { return !pubVencida(p); }).slice(0, 3).map(pubItem).join("") + '</ul>' +
+        '<p><a href="#/novidades">Ver todas as novidades</a></p>' +
         '<h2 class="upper">Exemplos de páginas de benefício</h2>' +
-        '<p class="rr-foot">Nesta versão de teste há nove benefícios, entre federais, estaduais do Paraná e municipais de Londrina, com fluxos e dificuldades diferentes de propósito.</p>' +
+        '<p class="rr-foot">Nesta versão de teste há 11 benefícios, entre federais, estaduais do Paraná e municipais de Londrina, com fluxos e dificuldades diferentes de propósito.</p>' +
         '<ul class="task-list">' + taskItem("fed-renda-001-bpc") + taskItem("fed-renda-004-bolsa-familia") +
           taskItem("mun-transporte-007-passe-londrina") + taskItem("est-saude-008-ceaf-pr") + '</ul>' +
       '</div>';
@@ -2420,7 +2504,7 @@ main { display:block; }
       secao(1, "Pode valer, depende de avaliação", "Falta informação, ou o seu caso fica na fronteira da regra. Vale conversar no CRAS antes de descartar.") +
       secao(0, "Provavelmente não é o seu caso agora", "Não sumimos com eles de propósito: a sua situação muda, a regra muda, e o motivo está escrito em cada um.") +
       (vazias.length ? '<h2 class="upper">Sem exemplo nesta versão</h2><p class="rr-foot">' + vazias.join(", ") +
-        '. Esta versão de teste traz só três benefícios federais. Numa versão completa entrariam aqui os direitos dessas áreas, inclusive os da sua cidade e do seu estado.</p>' : '') +
+        '. Esta versão de teste ainda não tem benefício nessa área. Numa versão completa entrariam aqui os direitos dessas áreas, inclusive os da sua cidade e do seu estado.</p>' : '') +
       '<div class="card"><p><b>Prefere resolver pessoalmente?</b> Vá ao CRAS mais perto de casa, leve um documento com foto. ' +
         'O atendimento é gratuito e a pessoa que atende pode fazer boa parte disto com você.</p></div>' +
       '<div class="btn-row"><a class="btn btn--ghost" href="#/parte/1">Refazer</a><a class="btn btn--ghost" href="#/">Início</a></div>' +
@@ -2526,6 +2610,8 @@ main { display:block; }
         Object.keys(CLASSE).map(function (k) { return '<strong>' + CLASSE[k].rot + '</strong>, ' + CLASSE[k].desc.charAt(0).toLowerCase() + CLASSE[k].desc.slice(1); }).join(" ") + '</p>' +
       '<ul class="sources">' + fontes + '</ul>' +
       (relacionado ? '<div data-hide-facil><h2 class="upper">Direitos relacionados</h2><ul>' + relacionado + '</ul></div>' : '') +
+      (pubsDe(key).length ? '<h2 class="upper">Novidades sobre este benefício</h2><ul>' +
+        pubsDe(key).map(function (p) { return '<li><a href="#/novidades/' + p.id + '">' + esc(p.titulo) + '</a></li>'; }).join("") + '</ul>' : '') +
       '<h2 class="upper">Achou algo errado ou desatualizado?</h2><p>Avise a curadoria. Diga qual informação está errada e, se puder, onde viu o dado certo. Não pede login nem dado pessoal.</p>' +
       '<details class="details aviso-wrap" data-hide-facil><summary>' + svg("fwd") + 'Avisar sobre esta informação</summary>' +
       '<div class="details__body">' + formAviso(b.id) + '</div></details>' +
@@ -2685,6 +2771,102 @@ main { display:block; }
       '<div class="card">' + formAviso("geral") + '</div></div>';
   }
 
+  /* ---------- novidades: lista, página e "isso vale para você?" ---------- */
+  function pubVencida(p) { var d = dnum(p.ate); return !!(d && d < HOJE); }
+  function pubPorId(id) { for (var i = 0; i < PUBLICACOES.length; i++) if (PUBLICACOES[i].id === id) return PUBLICACOES[i]; return null; }
+  function pubsDe(key) { return PUBLICACOES.filter(function (p) { return p.beneficios.indexOf(key) !== -1; }); }
+  function siteBase() {
+    var publicado = /^https?:$/.test(location.protocol) && location.hostname.indexOf("claude") === -1 && location.hostname !== "127.0.0.1";
+    return publicado ? location.origin + location.pathname : "https://acessa-plus.vercel.app/";
+  }
+  function pubItem(p) {
+    return '<li><span class="pub-tipo">' + PUB_TIPO[p.tipo] + '</span>' +
+      '<h3 class="task-list__name"><a href="#/novidades/' + p.id + '">' + esc(p.titulo) + '</a></h3>' +
+      '<p class="task-list__meta">' + esc(p.resumo) + '</p>' +
+      '<span class="pub-data">' + dbr(p.data) + (pubVencida(p) ? ' · em revisão' : '') + '</span></li>';
+  }
+  function pubMensagem(p) {
+    var l = [p.titulo, ""];
+    if (p.tipo === "mudou") {
+      if (p.antes) l.push("Antes: " + p.antes);
+      l.push("Agora: " + [].concat(p.agora).join(" "), "Desde: " + p.desde);
+    } else if (p.tipo === "duvida") l = l.concat(p.resposta);
+    else { l.push(p.exemplo); p.passos.forEach(function (s, i) { l.push((i + 1) + ". " + s); }); }
+    l.push("", "Veja no ACESSA+: " + siteBase() + "#/novidades/" + p.id);
+    return l.join("\n");
+  }
+  function blocoVale(p) {
+    var respondeu = resp.ajuda.length > 0 && resp.municipio !== "";
+    if (!respondeu) return '<div class="caminho" role="note"><h2>Isso vale para você?</h2>' +
+      '<p>Responda as 3 partes, cerca de 5 minutos, e esta página compara com a regra de cada benefício. Nada é salvo.</p>' +
+      '<p><a class="btn btn--go" href="#/parte/1">Responder agora <span aria-hidden="true">→</span></a></p></div>';
+    return '<div class="caminho" role="note"><h2>Isso vale para você?</h2><p>Pelo que você respondeu:</p><ul class="vale">' +
+      p.beneficios.map(function (k) {
+        var e = elegibilidade(k);
+        return '<li><a href="#/direito/' + k + '">' + BENEFITS[k].nome + '</a>' +
+          '<br><span class="tag ' + NIVEL[e.nivel].cls + '">' + NIVEL[e.nivel].rotulo + '</span>' +
+          (e.decisivo ? '<span class="porque">' + e.decisivo + '</span>' : '') + '</li>';
+      }).join("") + '</ul></div>';
+  }
+  function viewPublicacoes() {
+    setTitle("Novidades sobre direitos");
+    say("Novidades sobre direitos.");
+    return '<div class="wrap">' +
+      '<a class="backlink" href="#/">' + svg("back") + 'Início</a>' +
+      '<h1 class="upper" id="titulo-view" tabindex="-1">Novidades sobre direitos</h1>' +
+      '<p class="lead">Cada novidade vem de uma regra oficial, diz para quem vale e termina no que fazer.</p>' +
+      '<ul class="task-list">' + PUBLICACOES.map(pubItem).join("") + '</ul></div>';
+  }
+  function viewPublicacao(id) {
+    var p = pubPorId(id);
+    if (!p) return viewNaoEncontrado();
+    setTitle(p.titulo);
+    say(PUB_TIPO[p.tipo] + ". " + p.titulo);
+    var corpo;
+    if (p.tipo === "mudou") {
+      var agora = [].concat(p.agora);
+      corpo = '<div class="mudanca">' +
+          (p.antes ? '<div><h2>Antes</h2><p>' + esc(p.antes) + '</p></div>' : '') +
+          '<div class="agora"><h2>Agora</h2>' + (agora.length > 1
+            ? '<ul>' + agora.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join("") + '</ul>'
+            : '<p>' + esc(agora[0]) + '</p>') + '</div>' +
+        '</div>' +
+        '<h2 class="upper">Desde quando</h2><p>' + esc(p.desde) + '</p>' +
+        '<h2 class="upper">Para quem</h2><p>' + esc(p.quem) + '</p>';
+    } else if (p.tipo === "duvida") {
+      corpo = p.resposta.map(function (r, i) { return '<p' + (i === 0 ? ' class="lead"' : '') + '>' + esc(r) + '</p>'; }).join("");
+    } else {
+      corpo = '<div class="card card--note" role="note"><p>' + esc(p.exemplo) + '</p></div>' +
+        '<h2 class="upper">Por onde a família vai</h2><ol class="pub-passos">' +
+        p.passos.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join("") + '</ol>';
+    }
+    var warn = pubVencida(p)
+      ? '<div class="warning" role="note"><span class="mark" aria-hidden="true">!</span><p><span class="vh">Aviso. </span>Esta novidade passou da data de conferência. A regra pode ter mudado de novo. Confirme na fonte oficial antes de agir.</p></div>'
+      : '';
+    var fontes = p.fontes.length
+      ? '<ul>' + p.fontes.map(function (x) {
+          return '<li class="source"><span><strong>' + esc(x[0]) + '</strong><br>' + esc(x[1]) +
+            ' <a href="' + esc(x[2]) + '" target="_blank" rel="noopener noreferrer">abrir a fonte oficial<span class="vh">, abre em outra aba</span>' + svg("ext") + '</a></span></li>';
+        }).join("") + '</ul>'
+      : '<p>' + esc(p.nota) + '</p>';
+    var msg = pubMensagem(p);
+    return '<div class="wrap">' +
+      '<a class="backlink" href="#/novidades">' + svg("back") + 'Todas as novidades</a>' +
+      '<span class="pub-tipo">' + PUB_TIPO[p.tipo] + '</span>' +
+      '<h1 id="titulo-view" tabindex="-1">' + esc(p.titulo) + '</h1>' +
+      '<p class="metadata">Publicado em ' + dbr(p.data) + '. Conferido em ' + dbr(p.v) + '.</p>' +
+      warn + corpo +
+      '<p style="margin:1.5rem 0"><a class="btn btn--go" href="' + p.acao[1] + '">' + esc(p.acao[0]) + ' <span aria-hidden="true">→</span></a></p>' +
+      blocoVale(p) +
+      '<h2 class="upper">Mandar para alguém</h2>' +
+      '<div class="btn-row">' +
+        '<a class="btn btn--ghost" href="https://wa.me/?text=' + encodeURIComponent(msg) + '" target="_blank" rel="noopener noreferrer">Mandar no WhatsApp<span class="vh">, abre em outra aba</span></a>' +
+        '<button type="button" class="btn btn--ghost" data-copy="' + escAttr(msg) + '" data-ok="Mensagem copiada">' + svg("copy") + '<span class="btn-lbl">Copiar a mensagem</span></button>' +
+      '</div>' +
+      '<h2 class="upper">' + (p.fontes.length ? 'Fonte oficial' : 'Sobre este exemplo') + '</h2>' + fontes +
+      '</div>';
+  }
+
   /* ---------- links do piloto: um por unidade ou equipe ---------- */
   function viewLinksPiloto() {
     setTitle("Links do piloto");
@@ -2798,6 +2980,7 @@ main { display:block; }
     else if (parts[0] === "curadoria") html = viewCuradoria();
     else if (parts[0] === "aviso") html = viewAviso();
     else if (parts[0] === "links-piloto") html = viewLinksPiloto();
+    else if (parts[0] === "novidades") html = parts[1] ? viewPublicacao(parts[1]) : viewPublicacoes();
     else html = viewNaoEncontrado();
 
     var paint = function () {
@@ -2840,7 +3023,7 @@ main { display:block; }
     el.querySelectorAll("[data-copy]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         copyText(btn.getAttribute("data-copy"),
-          function () { say("Frase copiada."); flashBtn(btn, "Frase copiada"); },
+          function () { var ok = btn.getAttribute("data-ok") || "Frase copiada"; say(ok + "."); flashBtn(btn, ok); },
           function () { say("Não foi possível copiar. Selecione a frase acima e copie à mão."); flashBtn(btn, "Não deu para copiar"); });
       });
     });

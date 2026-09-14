@@ -1,5 +1,16 @@
 # Mudanças
 
+## v0.1.2-piloto — 14/09/2026
+
+- Novidades sobre direitos, em `#/novidades`: o que mudou, dúvida comum e
+  caminho de uma família fictícia. Cada novidade aponta para os benefícios que
+  mexe, tem fonte oficial e validade, compara com as respostas da pessoa sem
+  salvar nada e sai pronta para mandar no WhatsApp.
+- Salário mínimo de 2026 amarrado ao Decreto 12.797 de 2025.
+- Corrigido: contagem de benefícios no início, texto da pergunta do município e
+  da tela de resultado, linha de prazo do Energia Solidária e o passo 2 do
+  equipamento vital, que é presencial.
+
 ## v0.1.1-piloto — 12/09/2026
 
 - Publicação pelo Vercel, em https://acessa-plus.vercel.app, com os mesmos

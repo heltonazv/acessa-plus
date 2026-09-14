@@ -82,6 +82,10 @@ serviços como este:
 Endereços e telefones de locais só entram quando copiados de página oficial, com
 a data em que foram conferidos.
 
+As novidades sobre direitos ficam em `PUBLICACOES`. Cada uma aponta para os
+benefícios que mexe e tem fonte oficial, data de conferência e validade. Vencida
+a validade, ela sai do início e passa a se mostrar em revisão.
+
 ## Instrumentos e padrões
 
 - **Triagem de funcionalidade**: os cinco quesitos do Censo Demográfico 2022 do
